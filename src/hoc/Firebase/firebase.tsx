@@ -26,15 +26,14 @@ class Firebase {
   // *** Firestore API ***
   getVendors = () => {
     console.log('[Firebase, getVendors, invoiceCOllection]', this.invoiceCollection)
-    this.invoiceCollection.get()
+    return this.invoiceCollection.get()
     .then(querySnapshot => {
       console.log('[Firebase, getVendors, querySnapshot]', querySnapshot)
-      const uniqueVendors = new Set<Invoice>()
+      const uniqueVendors = new Set<string>()
       querySnapshot.forEach(doc => {
         uniqueVendors.add(doc.data()['Vendor'])
-      })
-      console.log(uniqueVendors)
-      
+      }) 
+      return uniqueVendors     
     })
     .catch(error => console.log('firebase error', error))
   }

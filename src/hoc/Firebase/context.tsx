@@ -22,7 +22,6 @@ interface WithFirebaseProps {
 
 export function withFirebase<T extends WithFirebaseProps = WithFirebaseProps>(WrappedComponent: React.ComponentType<T>) {
   const WithFirebase = (props: Omit<T, keyof WithFirebaseProps>) => {
-    // const firebaseProps = FirebaseContext
     return (
       <FirebaseContext.Consumer>
         {firebase => <WrappedComponent {...props as T} firebase={firebase} />}
