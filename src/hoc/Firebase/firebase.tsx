@@ -38,6 +38,36 @@ class Firebase {
     .catch(error => console.log('firebase error', error))
   }
 
+  getInvoiceData = (queryParams: {vendor?: string, startDate?:Date, endDate?:Date}) => {
+    console.log('[Firebase, getInvoiceData, queryParams]', queryParams)
+    let invoiceQuery: app.firestore.CollectionReference<app.firestore.DocumentData> | app.firestore.Query<app.firestore.DocumentData> = this.invoiceCollection
+    for (const param in queryParams) {
+      console.log('checking param', param)
+      switch (param) {
+        case 'vendor':
+          invoiceQuery = queryParams['vendor'] 
+            ? invoiceQuery.where('Vendor', '==', queryParams['vendor'])
+            : invoiceQuery
+          break;
+        case 'startDate':
+          // invoiceQuery = queryParams['startDate'] 
+          //   ? invoiceQuery.where('invoiceDate', '>=', queryParams['startDate'])
+          //   : invoiceQuery
+          break;
+        case 'endDate':
+          // invoiceQuery = queryParams['endDate']
+            // ? invoiceQuery.where('invoiceDate', '<=', queryParams['endDate'])
+            // : invoiceQuery
+          break;
+      }
+    }
+    return invoiceQuery.limit(25).get()
+      .then(querySnapshot => {
+        return querySnapshot.docs
+      })
+  }
+
+  
 }
 
 interface Invoice {

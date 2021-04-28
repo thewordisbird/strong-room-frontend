@@ -29,7 +29,7 @@ class App extends Component<AppProps, AppState> {
     <div className='App'>
       <Container maxWidth="md">
       <Search onChange={this.onSearchParamChange}/>
-      <Results />
+      <Results queryParams={this.state.searchQuery} />
     </Container>
     </div>
     
