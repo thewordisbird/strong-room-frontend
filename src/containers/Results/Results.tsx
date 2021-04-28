@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import Firebase from '../../hoc/Firebase';
 import { withFirebase } from '../../hoc/Firebase/context';
 import 'firebase';
-import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
+import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination, TableFooter } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 
 type ResultProps = {
@@ -15,7 +15,11 @@ type ResultProps = {
 }
 
 type ResultState = {
-  results: InvoiceData[]
+  results: InvoiceData[],
+  pagination: {
+    page: number;
+    rowsPerPage: number;
+  }
 }
 
 interface InvoiceData {
@@ -50,15 +54,21 @@ interface InvoiceData {
 }
 
 
+
+
 class Results extends Component<ResultProps, ResultState> {
   state: ResultState= {
-    results: []
+    results: [],
+    pagination: {
+      page: 0,
+      rowsPerPage: 25
+    }
   }
 
   componentDidMount = () => {
     // Return all results (use pagination to limit)
     console.log('[Results, componentDidMount]')
-    this.props.firebase.getInvoiceData(this.props.queryParams)
+    this.props.firebase.getInvoiceData(this.props.queryParams, this.state.pagination)
       .then(invoicedata => {
         const results = invoicedata.map(result => {
           const resultData = result.data() as InvoiceData
@@ -69,11 +79,11 @@ class Results extends Component<ResultProps, ResultState> {
       })
   }
 
-  componentDidUpdate = (prevProps: ResultProps) => {
+  componentDidUpdate = (prevProps: ResultProps, prevState: ResultState) => {
     // Update results with query restrictions from form (use pagination to limit)
     console.log('[Results, componentDidUpdate]')
-    if (prevProps.queryParams !== this.props.queryParams) {
-      this.props.firebase.getInvoiceData(this.props.queryParams)
+    if (prevProps.queryParams !== this.props.queryParams || prevState.pagination !== this.state.pagination) {
+      this.props.firebase.getInvoiceData(this.props.queryParams, this.state.pagination)
       .then(invoicedata => {
         const results = invoicedata.map(result => {
           const resultData = result.data() as InvoiceData
@@ -84,7 +94,35 @@ class Results extends Component<ResultProps, ResultState> {
       })
     }
   }
+
+  handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
+    console.log('changepage', newPage)
+    this.setState(prevState => (
+      {
+      ...prevState,
+      pagination: {
+        ...prevState.pagination,
+        page: newPage
+      }
+      }
+    ))
+  };
   
+  handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    this.setState(prevState => (
+      {
+        ...prevState,
+        pagination: {
+          ...prevState.pagination,
+            rowsPerPage: parseInt(event.target.value, 10),
+          page: 0
+        }
+      }
+    ))
+  };
+
   handleViewDetails = (id: string | undefined) => {
     console.log('clicked id', id)
   }
@@ -118,6 +156,24 @@ class Results extends Component<ResultProps, ResultState> {
             </TableRow>
           ))}
         </TableBody>
+        <TableFooter>
+          <TableRow>
+            <TablePagination
+              rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
+              colSpan={3}
+              count={rowData.length}
+              rowsPerPage={this.state.pagination.rowsPerPage}
+              page={this.state.pagination.page}
+              SelectProps={{
+                inputProps: { 'aria-label': 'rows per page' },
+                native: true,
+              }}
+              onChangePage={this.handleChangePage}
+              onChangeRowsPerPage={this.handleChangeRowsPerPage}
+              // ActionsComponent={}
+            />
+          </TableRow>
+        </TableFooter>
       </Table>
     </TableContainer>
       )

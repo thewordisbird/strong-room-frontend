@@ -15,12 +15,15 @@ class Firebase {
   firestore: app.firestore.Firestore;
   invoiceCollection: app.firestore.CollectionReference;
   vendors: Invoice[] = [];
+  lastQuery: app.firestore.CollectionReference<app.firestore.DocumentData> | app.firestore.Query<app.firestore.DocumentData>;
 
   constructor() {
     app.initializeApp(config);
 
     this.firestore = app.firestore();
     this.invoiceCollection = this.firestore.collection('invoice')
+    this.lastQuery = this.invoiceCollection;
+    
   }
 
   // *** Firestore API ***
@@ -38,16 +41,16 @@ class Firebase {
     .catch(error => console.log('firebase error', error))
   }
 
-  getInvoiceData = (queryParams: {vendor?: string, startDate?:Date, endDate?:Date}) => {
+  getInvoiceData = (queryParams: {vendor?: string, startDate?:Date, endDate?:Date}, pagination: {page?: number, rowsPerPage?: number}) => {
     console.log('[Firebase, getInvoiceData, queryParams]', queryParams)
-    let invoiceQuery: app.firestore.CollectionReference<app.firestore.DocumentData> | app.firestore.Query<app.firestore.DocumentData> = this.invoiceCollection
+    // let invoiceQuery: app.firestore.CollectionReference<app.firestore.DocumentData> | app.firestore.Query<app.firestore.DocumentData> = this.invoiceCollection
     for (const param in queryParams) {
       console.log('checking param', param)
       switch (param) {
         case 'vendor':
-          invoiceQuery = queryParams['vendor'] 
-            ? invoiceQuery.where('Vendor', '==', queryParams['vendor'])
-            : invoiceQuery
+          this.lastQuery = queryParams['vendor'] 
+            ? this.lastQuery.where('Vendor', '==', queryParams['vendor'])
+            : this.lastQuery
           break;
         case 'startDate':
           // invoiceQuery = queryParams['startDate'] 
@@ -61,7 +64,9 @@ class Firebase {
           break;
       }
     }
-    return invoiceQuery.limit(25).get()
+    
+    const limit = pagination.rowsPerPage as number
+    return this.lastQuery.limit(limit).get()
       .then(querySnapshot => {
         return querySnapshot.docs
       })
