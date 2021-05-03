@@ -11,15 +11,18 @@ type DetailsProps = RouteComponentProps & {
 type DetailsState = {
   invoiceData: InvoiceData;
   pdfUrl: string;
+  isLoading: boolean;
 }
 
 class Details extends Component<DetailsProps, DetailsState> {
   state: DetailsState = {
     invoiceData: {} as InvoiceData,
-    pdfUrl: ""
+    pdfUrl: "",
+    isLoading: false
   }
 
   async componentDidMount() {
+    this.setState({isLoading: true})
     const { location, firebase } = this.props
     const id = location.pathname.split('/')[2]
 
@@ -28,7 +31,8 @@ class Details extends Component<DetailsProps, DetailsState> {
     
     this.setState({
       invoiceData: invoiceData,
-      pdfUrl: pdfUrl
+      pdfUrl: pdfUrl,
+      isLoading: false
     })
   }
 
@@ -38,7 +42,7 @@ class Details extends Component<DetailsProps, DetailsState> {
 
     return (
       <Switch>
-      <Route path={`${match.path}/:invoiceId`}><InvoiceDetails invoiceData={this.state.invoiceData} pdfUrl={this.state.pdfUrl}/></Route>
+      <Route path={`${match.path}/:invoiceId`}><InvoiceDetails invoiceData={this.state.invoiceData} pdfUrl={this.state.pdfUrl} loading={this.state.isLoading}/></Route>
       <Route path={match.path}>No Invoice Selected</Route>
       </Switch>
     ) 

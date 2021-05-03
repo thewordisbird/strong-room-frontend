@@ -9,6 +9,7 @@ import {
   Route
 } from "react-router-dom"; 
 import Details from './containers/Details/Details';
+import NavBar from './components/Navbar/Navbar';
 type AppProps = {};
 
 type AppState = {
@@ -33,6 +34,7 @@ class App extends Component<AppProps, AppState> {
     return (
       <Container maxWidth="md">
         <div className='App'>
+          <NavBar />
           <Router>
             <Switch>
               <Route path="/details">
