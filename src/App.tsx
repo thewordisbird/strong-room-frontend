@@ -3,7 +3,12 @@ import './App.css';
 import Container from '@material-ui/core/Container';
 import Results from './containers/Results/Results';
 import Search from './containers/Search/Search';
-// import { render } from '@testing-library/react';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route
+} from "react-router-dom"; 
+import Details from './containers/Details/Details';
 type AppProps = {};
 
 type AppState = {
@@ -26,12 +31,22 @@ class App extends Component<AppProps, AppState> {
 
   render() {
     return (
-    <div className='App'>
       <Container maxWidth="md">
-      <Search onChange={this.onSearchParamChange}/>
-      <Results queryParams={this.state.searchQuery} />
-    </Container>
-    </div>
+        <div className='App'>
+          <Router>
+            <Switch>
+              <Route path="/details">
+                <Details />
+              </Route>
+              <Route path="/">
+                <Search onChange={this.onSearchParamChange}/>
+                <Results queryParams={this.state.searchQuery} />
+              </Route>
+            </Switch>
+          </Router>
+        </div>
+      </Container>
+    
     
   );
   }

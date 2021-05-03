@@ -1,5 +1,6 @@
 import app from 'firebase/app';
 import 'firebase/firestore';
+import InvoiceData from '../../shared/InvoiceData';
 
 const config = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -17,12 +18,18 @@ class Firebase {
   vendors: Invoice[] = [];
   lastQuery: app.firestore.CollectionReference<app.firestore.DocumentData> | app.firestore.Query<app.firestore.DocumentData>;
 
+  storage: app.storage.Storage;
+  sotragePathRef: app.storage.Reference;
+
   constructor() {
     app.initializeApp(config);
 
     this.firestore = app.firestore();
     this.invoiceCollection = this.firestore.collection('invoice')
     this.lastQuery = this.invoiceCollection;
+
+    this.storage = app.storage()
+    this.sotragePathRef = this.storage.ref()
     
   }
 
@@ -70,6 +77,22 @@ class Firebase {
       .then(querySnapshot => {
         return querySnapshot.docs
       })
+  }
+
+  getInvoice = (id: string) => {
+    return this.invoiceCollection.doc(id).get()
+      .then(snapShot => {
+        return snapShot.data() as InvoiceData
+      })
+  }
+
+  // *** Storage API ***
+  getPdfUrl = (invoiceId: string) => {
+    const storageRef = this.sotragePathRef.child(invoiceId)
+
+    return storageRef.getDownloadURL()
+      .then(url => url)
+      .catch(error => console.log('storage error', error))
   }
 
   

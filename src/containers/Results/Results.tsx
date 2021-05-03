@@ -4,8 +4,10 @@ import { withFirebase } from '../../hoc/Firebase/context';
 import 'firebase';
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination, TableFooter } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
+import { withRouter, RouteComponentProps } from 'react-router-dom'
+import InvoiceData from '../../shared/InvoiceData'
 
-type ResultProps = {
+type ResultProps = RouteComponentProps & {
   queryParams: {
     vendor?: string;
     startDate?: Date;
@@ -22,40 +24,6 @@ type ResultState = {
   }
 }
 
-interface InvoiceData {
-  id?: string;
-  "AvidPay Check": string;
-  "Cash Account": string;
-  "Cleared Date": string;
-  "Delivery Method": string;
-  "Delivery Status": string;
-  "G/L Amount": string;
-  "Invoice Count": string;
-  "Last Update Date": string;
-  "Pay TransactionId": string;
-  "Payment Amount": string;
-  "Bank Account": string;
-  "Check": string;
-  "Code": string;
-  "Company": string;
-  "Date Paid": string;
-  "G/L Account": string;
-  "Invoice Amount": string;
-  "Invoice Id": string;
-  "Invoice Num": string;
-  "Vendor": string;
-  "checkStubNote": string;
-  "dueDate": string;
-  "internalNote": string;
-  "invoiceDate": string;
-  "pdfId": string;
-  "topsRef": string;
-  "trxnDate": string;
-}
-
-
-
-
 class Results extends Component<ResultProps, ResultState> {
   state: ResultState= {
     results: [],
@@ -63,7 +31,7 @@ class Results extends Component<ResultProps, ResultState> {
       page: 0,
       rowsPerPage: 25
     }
-  }
+  }  
 
   componentDidMount = () => {
     // Return all results (use pagination to limit)
@@ -124,7 +92,7 @@ class Results extends Component<ResultProps, ResultState> {
   };
 
   handleViewDetails = (id: string | undefined) => {
-    console.log('clicked id', id)
+    this.props.history.push(`/details/${id}`)
   }
   render () {
     const rowData = this.state.results.map(result => {
@@ -180,4 +148,4 @@ class Results extends Component<ResultProps, ResultState> {
   }
 }
 
-export default withFirebase(Results);
+export default withRouter(withFirebase(Results));
