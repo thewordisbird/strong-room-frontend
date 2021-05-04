@@ -1,5 +1,7 @@
 import app from 'firebase/app';
 import 'firebase/firestore';
+import 'firebase/storage'
+
 import InvoiceData from '../../shared/InvoiceData';
 
 const config = {

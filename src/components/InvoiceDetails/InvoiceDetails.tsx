@@ -10,8 +10,12 @@ import Firebase from '../../hoc/Firebase';
 import InvoiceData from '../../shared/InvoiceData';
 
 const styles = createStyles({
+  root: {
+    marginTop: '32px',
+    marginBottom: '24px'
+  },
   loading: {
-    margin: '25px auto',
+    margin: 'auto',
     width: '95%'
   },
   icon: {
@@ -106,7 +110,7 @@ const InvoiceDetails = (props: InvoiceDetailsProps) => {
       </>
     )
   
-  return <div>{content}</div>
+  return <div className={classes.root}>{content}</div>
 }
 
 export default withFirebase(

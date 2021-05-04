@@ -2,13 +2,25 @@ import React, { Component } from 'react';
 
 import { withFirebase } from '../../hoc/Firebase/context';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
+import { withStyles, WithStyles, createStyles } from '@material-ui/core/styles'
 
 import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination, TableFooter } from '@material-ui/core';
 
 import InvoiceData from '../../shared/InvoiceData'
 import Firebase from '../../hoc/Firebase';
+import { LinearProgress } from '@material-ui/core';
 
-type ResultProps = RouteComponentProps & {
+const styles = createStyles({
+  root: {
+    marginBottom: '24px'
+  },
+  loading: {
+    margin: 'auto',
+    width: '95%'
+  },
+})
+
+type ResultProps = RouteComponentProps & WithStyles<typeof styles> & {
   queryParams: {
     vendor?: string;
     startDate?: Date;
@@ -22,7 +34,8 @@ type ResultState = {
   pagination: {
     page: number;
     rowsPerPage: number;
-  }
+  },
+  isLoading: boolean
 }
 
 class Results extends Component<ResultProps, ResultState> {
@@ -31,18 +44,20 @@ class Results extends Component<ResultProps, ResultState> {
     pagination: {
       page: 0,
       rowsPerPage: 25
-    }
+    },
+    isLoading: false
   }  
 
   componentDidMount = () => {
     // Return all results (use pagination to limit)
+    this.setState({isLoading: true})
     this.props.firebase.getInvoiceData(this.props.queryParams, this.state.pagination).then(invoicedata => {
       const results = invoicedata.map(result => {
         const resultData = result.data() as InvoiceData
         resultData.id = result.id
         return resultData
       })
-      this.setState({results: results})  
+      this.setState({results: results, isLoading: false})  
     })
   }
 
@@ -89,6 +104,7 @@ class Results extends Component<ResultProps, ResultState> {
     this.props.history.push(`/details/${id}`)
   }
   render () {
+    const { classes } = this.props
     const rowData = this.state.results.map(result => {
       return {
         id: result['id'],
@@ -98,51 +114,56 @@ class Results extends Component<ResultProps, ResultState> {
         invoiceAmount: result['Invoice Amount']
       }
     })
-    return (
-      <TableContainer component={Paper}>
-        <Table className="table" aria-label="simple table">
-          <TableHead>
-            <TableRow>
-              <TableCell size="small">Details</TableCell>
-              <TableCell align="left">Vendor</TableCell>
-              <TableCell align="left">Invoice Date</TableCell>
-              <TableCell align="left">Invoice Amount</TableCell>
-              <TableCell align="left">Check Number</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rowData.map((row) => (
-              <TableRow key={row.id}>
-                <TableCell component="th" scope="row"><Button variant="contained" onClick={()=>this.handleViewDetails(row.id)}>View Details</Button></TableCell>
-                <TableCell align="left">{row.vendor}</TableCell>
-                <TableCell align="left">{row.invoiceDate}</TableCell>
-                <TableCell align="left">{row.invoiceAmount}</TableCell>
-                <TableCell align="left">{row.check}</TableCell>
+
+    const content = this.state.isLoading
+      ? <LinearProgress className={classes.loading}/>
+      : (
+        <TableContainer component={Paper}>
+          <Table className="table" aria-label="simple table">
+            <TableHead>
+              <TableRow>
+                <TableCell size="small">Details</TableCell>
+                <TableCell align="left">Vendor</TableCell>
+                <TableCell align="left">Invoice Date</TableCell>
+                <TableCell align="left">Invoice Amount</TableCell>
+                <TableCell align="left">Check Number</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-          <TableFooter>
-            <TableRow>
-              <TablePagination
-                rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
-                colSpan={3}
-                count={rowData.length}
-                rowsPerPage={this.state.pagination.rowsPerPage}
-                page={this.state.pagination.page}
-                SelectProps={{
-                  inputProps: { 'aria-label': 'rows per page' },
-                  native: true,
-                }}
-                onChangePage={this.handleChangePage}
-                onChangeRowsPerPage={this.handleChangeRowsPerPage}
-                // ActionsComponent={}
-              />
-            </TableRow>
-          </TableFooter>
-        </Table>
-      </TableContainer>
-    )
+            </TableHead>
+            <TableBody>
+              {rowData.map((row) => (
+                <TableRow key={row.id}>
+                  <TableCell component="th" scope="row"><Button variant="contained" onClick={()=>this.handleViewDetails(row.id)}>View Details</Button></TableCell>
+                  <TableCell align="left">{row.vendor}</TableCell>
+                  <TableCell align="left">{row.invoiceDate}</TableCell>
+                  <TableCell align="left">{row.invoiceAmount}</TableCell>
+                  <TableCell align="left">{row.check}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+            <TableFooter>
+              <TableRow>
+                <TablePagination
+                  rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
+                  colSpan={3}
+                  count={rowData.length}
+                  rowsPerPage={this.state.pagination.rowsPerPage}
+                  page={this.state.pagination.page}
+                  SelectProps={{
+                    inputProps: { 'aria-label': 'rows per page' },
+                    native: true,
+                  }}
+                  onChangePage={this.handleChangePage}
+                  onChangeRowsPerPage={this.handleChangeRowsPerPage}
+                  // ActionsComponent={}
+                />
+              </TableRow>
+            </TableFooter>
+          </Table>
+        </TableContainer>)
+    return <div className={classes.root}>{content}</div>
   }
 }
 
-export default withRouter(withFirebase(Results));
+export default withRouter(
+                withFirebase(
+                  withStyles(styles)(Results)));
