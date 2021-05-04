@@ -34,18 +34,19 @@ class Firebase {
   }
 
   // *** Firestore API ***
-  getVendors = () => {
-    console.log('[Firebase, getVendors, invoiceCOllection]', this.invoiceCollection)
-    return this.invoiceCollection.get()
-    .then(querySnapshot => {
-      console.log('[Firebase, getVendors, querySnapshot]', querySnapshot)
+  getVendors = () =>  {
+    return this.invoiceCollection.get().then(querySnapshot => {
       const uniqueVendors = new Set<string>()
       querySnapshot.forEach(doc => {
         uniqueVendors.add(doc.data()['Vendor'])
       }) 
       return uniqueVendors     
     })
-    .catch(error => console.log('firebase error', error))
+    .catch(error => {
+      console.log('firebase error', error)
+      // Return an empty set
+      return new Set<string>()
+    })
   }
 
   getInvoiceData = (queryParams: {vendor?: string, startDate?:Date, endDate?:Date}, pagination: {page?: number, rowsPerPage?: number}) => {
