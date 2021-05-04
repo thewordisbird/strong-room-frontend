@@ -14,12 +14,14 @@ type AppProps = {};
 
 type AppState = {
   searchQuery: {vendor?: string | null, startDate?: Date | null, endDate?: Date | null}
+  isAuthenticated: boolean;
 }
 
 
 class App extends Component<AppProps, AppState> {
   state = {
-    searchQuery: {}
+    searchQuery: {},
+    isAuthenticated: true
   }
 
   onSearchParamChange = (params : {vendor?: string | null, startDate?: Date | null, endDate?: Date | null}) => {
@@ -32,10 +34,10 @@ class App extends Component<AppProps, AppState> {
 
   render() {
     return (
+  <Router>
+    <NavBar title="Burbank Square" isAuthenticated={this.state.isAuthenticated}/>
       <Container maxWidth="md">
         <div className='App'>
-          <NavBar />
-          <Router>
             <Switch>
               <Route path="/details">
                 <Details />
@@ -45,9 +47,10 @@ class App extends Component<AppProps, AppState> {
                 <Results queryParams={this.state.searchQuery} />
               </Route>
             </Switch>
-          </Router>
+          
         </div>
       </Container>
+    </Router>
     
     
   );
