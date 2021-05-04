@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { withStyles, WithStyles, createStyles } from '@material-ui/core/styles'
 import { withFirebase } from '../../hoc/Firebase/context';
+import { withStyles, WithStyles, createStyles } from '@material-ui/core/styles'
 
 import PictureAsPdfIcon from '@material-ui/icons/PictureAsPdf';
 import { Grid, LinearProgress, Typography, Card, CardContent } from '@material-ui/core';
