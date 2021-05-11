@@ -53,7 +53,7 @@ const  InvoiceSearch: React.FC<SearchProps> = (props) => {
               // style={{ width: "75%" }}
               fullWidth
               onChange={handleVendorChange}
-              renderInput={(params) => <TextField {...params} label="Combo box" variant="outlined" />}
+              renderInput={(params) => <TextField {...params} label="Select Vendor" variant="outlined" />}
             />
             </Grid>
             <MuiPickersUtilsProvider utils={DateFnsUtils}>

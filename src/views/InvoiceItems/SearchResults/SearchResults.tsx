@@ -1,8 +1,10 @@
-import { TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, Button, TableFooter, TablePagination, withStyles } from '@material-ui/core';
-import React, {useState} from 'react';
+import { TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, Button, TableFooter, TablePagination } from '@material-ui/core';
+import LinearProgress from '@material-ui/core/LinearProgress';
+import React, {Component} from 'react';
+import { withRouter, RouteComponentProps } from 'react-router-dom';
 import { InvoiceData } from '../../../shared/Firebase/firebase';
 
-type SearchResultsProps = {
+type SearchResultsProps = RouteComponentProps & {
   loading: boolean;
   invoices: InvoiceData[];
 }
@@ -12,97 +14,103 @@ type SearchResultsState = {
   rowsPerPage: number;
 }
 
-const SearchResults: React.FC<SearchResultsProps> = (props) => {
-  const { loading, invoices } = props;
-
-  const [pagination, setPagination] = useState<SearchResultsState>({
+class SearchResults extends Component<SearchResultsProps, SearchResultsState> {
+  state: SearchResultsState = {
     page: 0,
     rowsPerPage: 25
-  })
-
-  const onSelect = (id: string | undefined) => {
-
   }
 
-  const onChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
-    setPagination(prevState => (
-      {
-      ...prevState,
-        page: newPage
-      }
-    ))
+  onSelect = (id: string | undefined) => {
+    console.log(id)
+    this.props.history.push(`/details/${id}`)
+  }
+
+  onChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
+    this.setState({page: newPage})
   };
   
-  const onChangeRowsPerPage = (
+  onChangeRowsPerPage = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
-    setPagination(prevState => (
+    this.setState(
       {
-        ...prevState,
-          rowsPerPage: parseInt(event.target.value, 10),
-          page: 0
-        }
-    ))
+        rowsPerPage: parseInt(event.target.value, 10),
+        page: 0
+      }
+    )
   };
   
-  const getRowData = () => {
-    const startIndex = pagination.page === 0 ? 0 : pagination.page * pagination.rowsPerPage + 1
-    const endIndex = startIndex + pagination.rowsPerPage + 1 < invoices.length ? startIndex + pagination.rowsPerPage + 1: invoices.length
+  getRowData = () => {
+    const invoiceCount = this.props.invoices.length
+    const startIndex = this.state.page === 0 ? 0 : this.state.page * this.state.rowsPerPage + 1
+    const endIndex = startIndex + this.state.rowsPerPage + 1 < invoiceCount ? startIndex + this.state.rowsPerPage + 1: invoiceCount
     console.log(startIndex, endIndex)
-    return invoices.slice(startIndex, endIndex).map(invoice => (
+    return this.props.invoices.slice(startIndex, endIndex).map(invoice => (
       {
         id: invoice['id'],
         vendor: invoice['Vendor'],
         check: invoice['Check'],
-        invoiceDate: invoice['invoiceDate']
+        invoiceDate: invoice['invoiceDate'],
+        invoiceAmount: invoice['Invoice Amount']
       }
     ))
   }
+  
+  render () {
+    const { loading, invoices } = this.props;
+    let content = <LinearProgress />
 
-  const rowData = getRowData();
+    if (!loading) {
+      const rowData = this.getRowData();
+      console.log(rowData)
+      content = (
+        <TableContainer component={Paper}>
+        <Table className="table" aria-label="simple table">
+          <TableHead>
+            <TableRow>
+              <TableCell size="small">Details</TableCell>
+              <TableCell align="left">Vendor</TableCell>
+              <TableCell align="left">Invoice Amount</TableCell>
+              <TableCell align="left">Invoice Date</TableCell>
+              <TableCell align="left">Check Number</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {rowData.map((row) => (
+              <TableRow key={row.id}>
+                <TableCell component="th" scope="row"><Button variant="contained" onClick={()=>this.onSelect(row.id)}>View Details</Button></TableCell>
+                <TableCell align="left">{row.vendor}</TableCell>
+                <TableCell align="left">${row.invoiceAmount}</TableCell>
+                <TableCell align="left">{row.invoiceDate}</TableCell>
+                <TableCell align="left">{row.check}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+          <TableFooter>
+            <TableRow>
+              <TablePagination
+                rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
+                colSpan={3}
+                count={invoices.length}
+                rowsPerPage={this.state.rowsPerPage}
+                page={this.state.page}
+                SelectProps={{
+                  inputProps: { 'aria-label': 'rows per page' },
+                  native: true,
+                }}
+                onChangePage={this.onChangePage}
+                onChangeRowsPerPage={this.onChangeRowsPerPage}
+                // ActionsComponent={}
+              />
+            </TableRow>
+          </TableFooter>
+        </Table>
+      </TableContainer>
+      )
+    }
 
-  return (
-    <TableContainer component={Paper}>
-    <Table className="table" aria-label="simple table">
-      <TableHead>
-        <TableRow>
-          <TableCell size="small">Details</TableCell>
-          <TableCell align="left">Vendor</TableCell>
-          <TableCell align="left">Check Number</TableCell>
-          <TableCell align="left">Invoice Date</TableCell>
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {rowData.map((row) => (
-          <TableRow key={row.id}>
-            <TableCell component="th" scope="row"><Button variant="contained" onClick={()=>onSelect(row.id)}>View Details</Button></TableCell>
-            <TableCell align="left">{row.vendor}</TableCell>
-            <TableCell align="left">{row.check}</TableCell>
-            <TableCell align="left">{row.invoiceDate}</TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-      <TableFooter>
-        <TableRow>
-          <TablePagination
-            rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
-            colSpan={3}
-            count={invoices.length}
-            rowsPerPage={pagination.rowsPerPage}
-            page={pagination.page}
-            SelectProps={{
-              inputProps: { 'aria-label': 'rows per page' },
-              native: true,
-            }}
-            onChangePage={onChangePage}
-            onChangeRowsPerPage={onChangeRowsPerPage}
-            // ActionsComponent={}
-          />
-        </TableRow>
-      </TableFooter>
-    </Table>
-  </TableContainer>
-    )
+  return <div>{content}</div>
+  }
 }
 
-export default SearchResults;
+export default withRouter(SearchResults);

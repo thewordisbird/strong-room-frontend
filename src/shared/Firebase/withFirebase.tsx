@@ -6,7 +6,6 @@ export interface WithFirebaseProps {
   firebase: Firebase;
 }
 
-
 export function withFirebase<T extends WithFirebaseProps = WithFirebaseProps>(WrappedComponent: React.ComponentType<T>) {
   const WithFirebase = (props: Omit<T, keyof WithFirebaseProps>) => {
     return (
@@ -17,5 +16,3 @@ export function withFirebase<T extends WithFirebaseProps = WithFirebaseProps>(Wr
   }
   return WithFirebase
 }
-
-// export default withFirebase

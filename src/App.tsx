@@ -1,13 +1,11 @@
 import React, { Component } from 'react';
 
-import NavBar from './components/Navbar/Navbar';
-// import Search from './views/InvoiceItems/InvoiceSearch/InvoiceSearch';
-// import Results from './views/InvoiceItems/InvoiceResults/InvoiceResults';
-// import Details from './containers/Details/Details';
+import NavBar from './shared/Navbar/Navbar';
 
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom"; 
 import Container from '@material-ui/core/Container';
 import InvoiceItems from './views/InvoiceItems/InvoiceItems';
+import InvoiceDetails from './views/InvoiceDetails/InvoiceDetails';
 
 type AppProps = {};
 
@@ -38,7 +36,7 @@ class App extends Component<AppProps, AppState> {
           <Switch>
             <Route path="/details">
               {/* <Details /> */}
-              <p>details</p>
+              <InvoiceDetails />
             </Route>
             <Route path="/">
               <InvoiceItems />

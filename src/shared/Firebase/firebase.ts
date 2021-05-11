@@ -66,7 +66,10 @@ class Firebase {
     return this.invoiceCollection.withConverter(converter)
       .get()
       .then((snapshot) => {
-        const results = snapshot.docs.map(doc => doc.data());
+        const results = snapshot.docs.map(doc => {
+          const invoice = doc.data()
+          return {...invoice, id: doc.id}
+        });
         return results
       })
       .catch(error => console.log(error))
@@ -87,41 +90,42 @@ class Firebase {
     })
   }
 
-  getInvoiceData = (queryParams: {vendor?: string, startDate?:Date, endDate?:Date}, pagination: {page?: number, rowsPerPage?: number}) => {
-    console.log('[Firebase, getInvoiceData, queryParams]', queryParams)
-    // let invoiceQuery: app.firestore.CollectionReference<app.firestore.DocumentData> | app.firestore.Query<app.firestore.DocumentData> = this.invoiceCollection
-    for (const param in queryParams) {
-      console.log('checking param', param)
-      switch (param) {
-        case 'vendor':
-          this.lastQuery = queryParams['vendor'] 
-            ? this.lastQuery.where('Vendor', '==', queryParams['vendor'])
-            : this.lastQuery
-          break;
-        case 'startDate':
-          // invoiceQuery = queryParams['startDate'] 
-          //   ? invoiceQuery.where('invoiceDate', '>=', queryParams['startDate'])
-          //   : invoiceQuery
-          break;
-        case 'endDate':
-          // invoiceQuery = queryParams['endDate']
-            // ? invoiceQuery.where('invoiceDate', '<=', queryParams['endDate'])
-            // : invoiceQuery
-          break;
-      }
-    }
+  // getInvoiceData = (queryParams: {vendor?: string, startDate?:Date, endDate?:Date}, pagination: {page?: number, rowsPerPage?: number}) => {
+  //   console.log('[Firebase, getInvoiceData, queryParams]', queryParams)
+  //   // let invoiceQuery: app.firestore.CollectionReference<app.firestore.DocumentData> | app.firestore.Query<app.firestore.DocumentData> = this.invoiceCollection
+  //   for (const param in queryParams) {
+  //     console.log('checking param', param)
+  //     switch (param) {
+  //       case 'vendor':
+  //         this.lastQuery = queryParams['vendor'] 
+  //           ? this.lastQuery.where('Vendor', '==', queryParams['vendor'])
+  //           : this.lastQuery
+  //         break;
+  //       case 'startDate':
+  //         // invoiceQuery = queryParams['startDate'] 
+  //         //   ? invoiceQuery.where('invoiceDate', '>=', queryParams['startDate'])
+  //         //   : invoiceQuery
+  //         break;
+  //       case 'endDate':
+  //         // invoiceQuery = queryParams['endDate']
+  //           // ? invoiceQuery.where('invoiceDate', '<=', queryParams['endDate'])
+  //           // : invoiceQuery
+  //         break;
+  //     }
+  //   }
     
-    const limit = pagination.rowsPerPage as number
-    return this.lastQuery.limit(limit).get()
-      .then(querySnapshot => {
-        return querySnapshot.docs
-      })
-  }
+  //   const limit = pagination.rowsPerPage as number
+  //   return this.lastQuery.limit(limit).get()
+  //     .then(querySnapshot => {
+  //       return querySnapshot.docs
+  //     })
+  // }
 
   getInvoice = (id: string) => {
-    return this.invoiceCollection.doc(id).get()
+    return this.invoiceCollection.doc(id).withConverter(converter).get()
       .then(snapShot => {
-        return snapShot.data() as InvoiceData
+        const invoiceData = snapShot.data() 
+        return {...invoiceData, id: snapShot.id} as InvoiceData
       })
   }
 

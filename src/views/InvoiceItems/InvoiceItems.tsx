@@ -91,8 +91,17 @@ class InvoiceItems extends Component<InvoiceItemsProps, InvoiceItemsState>{
     ))
 
     const invoices = await this.props.firebase.loadInvoices();
+    
     if (invoices) {
       const vendors = uniqueVendors(invoices)
+
+      // Sort invoices by invoice date
+      invoices.sort((a,b) => {
+        const dateA = new Date(a.invoiceDate)
+        const dateB = new Date(b.invoiceDate)
+        return dateA > dateB ? -1 : 1
+      })
+
       this.setState(prevState => (
         {
           ...prevState,
