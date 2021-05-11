@@ -3,8 +3,7 @@ import React from 'react'
 import { withStyles, WithStyles, createStyles } from '@material-ui/core/styles'
 
 import { NavLink } from 'react-router-dom';
-import { AppBar, Container, Toolbar, IconButton, Typography, Button } from '@material-ui/core'
-import MenuIcon from '@material-ui/icons/Menu';
+import { AppBar, Container, Toolbar, Typography, Button } from '@material-ui/core'
 
 const styles = createStyles({
   root: {
@@ -61,6 +60,5 @@ const NavBar = ({title, isAuthenticated, classes}: NavBarProps ) => (
     </AppBar>
   </div>
 )
-
 
 export default withStyles(styles)(NavBar);

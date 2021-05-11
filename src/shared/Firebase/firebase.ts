@@ -43,8 +43,7 @@ const converter = {
 class Firebase {
   firestore: app.firestore.Firestore;
   invoiceCollection: app.firestore.CollectionReference;
-  vendors: Invoice[] = [];
-  lastQuery: app.firestore.CollectionReference<app.firestore.DocumentData> | app.firestore.Query<app.firestore.DocumentData>;
+  
   storage: app.storage.Storage;
   sotragePathRef: app.storage.Reference;
 
@@ -53,16 +52,14 @@ class Firebase {
 
     this.firestore = app.firestore();
     this.invoiceCollection = this.firestore.collection('invoice')
-    this.lastQuery = this.invoiceCollection;
 
     this.storage = app.storage()
     this.sotragePathRef = this.storage.ref()
   }
 
   // *** Firestore API ***
-  // Because this is a realtively small dataset that is read only and will never be updated, Only one databse query is made when the application is loaded.
-  // The data will be stored in an object in local memory and any sort and filtering operations will be performed locally.
-  loadInvoices(){
+  // To work with material-ui pagination the entire dataset is fetched and manipulated locally
+  getInvoices(){
     return this.invoiceCollection.withConverter(converter)
       .get()
       .then((snapshot) => {
@@ -90,37 +87,6 @@ class Firebase {
     })
   }
 
-  // getInvoiceData = (queryParams: {vendor?: string, startDate?:Date, endDate?:Date}, pagination: {page?: number, rowsPerPage?: number}) => {
-  //   console.log('[Firebase, getInvoiceData, queryParams]', queryParams)
-  //   // let invoiceQuery: app.firestore.CollectionReference<app.firestore.DocumentData> | app.firestore.Query<app.firestore.DocumentData> = this.invoiceCollection
-  //   for (const param in queryParams) {
-  //     console.log('checking param', param)
-  //     switch (param) {
-  //       case 'vendor':
-  //         this.lastQuery = queryParams['vendor'] 
-  //           ? this.lastQuery.where('Vendor', '==', queryParams['vendor'])
-  //           : this.lastQuery
-  //         break;
-  //       case 'startDate':
-  //         // invoiceQuery = queryParams['startDate'] 
-  //         //   ? invoiceQuery.where('invoiceDate', '>=', queryParams['startDate'])
-  //         //   : invoiceQuery
-  //         break;
-  //       case 'endDate':
-  //         // invoiceQuery = queryParams['endDate']
-  //           // ? invoiceQuery.where('invoiceDate', '<=', queryParams['endDate'])
-  //           // : invoiceQuery
-  //         break;
-  //     }
-  //   }
-    
-  //   const limit = pagination.rowsPerPage as number
-  //   return this.lastQuery.limit(limit).get()
-  //     .then(querySnapshot => {
-  //       return querySnapshot.docs
-  //     })
-  // }
-
   getInvoice = (id: string) => {
     return this.invoiceCollection.doc(id).withConverter(converter).get()
       .then(snapShot => {
@@ -137,15 +103,6 @@ class Firebase {
       .then(url => url)
       .catch(error => console.log('storage error', error))
   }
-
-  
 }
 
-interface Invoice {
-  "Pay TransactionId": string;
-  "Payment Amount": string;
-  "Bank Account": string;
-  "Check": string;
-
-}
 export default Firebase;

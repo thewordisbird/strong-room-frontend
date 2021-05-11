@@ -1,15 +1,13 @@
 import React, { Component } from 'react';
 
-import InvoiceSearch from './InvoiceSearch/InvoiceSearch'
-
-
 import { withFirebase, WithFirebaseProps } from '../../shared/Firebase/withFirebase'
-import { InvoiceData } from '../../shared/Firebase/firebase';
+
+import InvoiceSearch from './InvoiceSearch/InvoiceSearch'
 import SearchResults from './SearchResults/SearchResults';
 
-type InvoiceItemsProps = WithFirebaseProps & {
+import { InvoiceData } from '../../shared/Firebase/firebase';
 
-};
+type InvoiceItemsProps = WithFirebaseProps
 
 type InvoiceItemsState = {
   isLoading: {
@@ -90,7 +88,7 @@ class InvoiceItems extends Component<InvoiceItemsProps, InvoiceItemsState>{
       }
     ))
 
-    const invoices = await this.props.firebase.loadInvoices();
+    const invoices = await this.props.firebase.getInvoices();
     
     if (invoices) {
       const vendors = uniqueVendors(invoices)
@@ -156,7 +154,7 @@ class InvoiceItems extends Component<InvoiceItemsProps, InvoiceItemsState>{
     return (
       <div className="">
         <InvoiceSearch loading={this.state.isLoading.isLoadingSearch} vendors={this.state.queryData.vendors} searchParams={this.state.searchParams} onChange={this.onSearchParamChange}/>
-       <SearchResults loading={this.state.isLoading.isLoadingResults} invoices={this.state.queryData.filteredInvoices} />
+        <SearchResults loading={this.state.isLoading.isLoadingResults} invoices={this.state.queryData.filteredInvoices} />
       </div>
     );
   };

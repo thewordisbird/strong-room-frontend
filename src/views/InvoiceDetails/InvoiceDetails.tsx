@@ -1,10 +1,13 @@
-import { LinearProgress } from '@material-ui/core';
-import { withStyles, WithStyles, createStyles } from '@material-ui/core/styles'
 import React, { Component } from 'react';
-import { Switch, Route, Redirect, withRouter, RouteComponentProps} from 'react-router-dom'
-import { InvoiceData } from '../../shared/Firebase/firebase';
+
+import { withStyles, WithStyles, createStyles } from '@material-ui/core/styles'
+import { Switch, Route, withRouter, RouteComponentProps} from 'react-router-dom'
 import { withFirebase, WithFirebaseProps } from '../../shared/Firebase/withFirebase';
+
 import Details from './Details/Details';
+import { LinearProgress } from '@material-ui/core';
+
+import { InvoiceData } from '../../shared/Firebase/firebase';
 
 const styles = createStyles({
   root: {
@@ -55,12 +58,8 @@ class InvoiceDetails extends Component<InvoiceDetailsProps, InvoiceDetailsState>
           isLoading: false
         })
     }
-    
-    
-   
   }
 
-  
   render () {
     const { match, classes } = this.props
     

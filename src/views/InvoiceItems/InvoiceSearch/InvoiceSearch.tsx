@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
+import React from 'react';
 
 import { withStyles, WithStyles, createStyles } from '@material-ui/core/styles'
 
 import { Card, CardContent, Grid, TextField } from '@material-ui/core';
-import Autocomplete from '@material-ui/lab/Autocomplete'
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
+import Autocomplete from '@material-ui/lab/Autocomplete'
 import DateFnsUtils from '@date-io/date-fns';
 
 const styles = createStyles({
@@ -26,7 +26,7 @@ type SearchProps = WithStyles<typeof styles> & {
 }
 
 const  InvoiceSearch: React.FC<SearchProps> = (props) => {
-  const { loading, vendors, searchParams, onChange, classes } = props
+  const { vendors, searchParams, onChange, classes } = props
 
   // Handlers
   const handleVendorChange = (event: React.ChangeEvent<{}>, newValue: string | null) => {

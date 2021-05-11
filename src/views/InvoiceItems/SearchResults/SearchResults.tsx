@@ -1,7 +1,9 @@
-import { TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, Button, TableFooter, TablePagination } from '@material-ui/core';
-import LinearProgress from '@material-ui/core/LinearProgress';
 import React, {Component} from 'react';
+
 import { withRouter, RouteComponentProps } from 'react-router-dom';
+
+import { TableContainer, LinearProgress, Paper, Table, TableHead, TableRow, TableCell, TableBody, Button, TableFooter, TablePagination } from '@material-ui/core';
+
 import { InvoiceData } from '../../../shared/Firebase/firebase';
 
 type SearchResultsProps = RouteComponentProps & {
@@ -109,7 +111,7 @@ class SearchResults extends Component<SearchResultsProps, SearchResultsState> {
       )
     }
 
-  return <div>{content}</div>
+    return <div>{content}</div>
   }
 }
 
