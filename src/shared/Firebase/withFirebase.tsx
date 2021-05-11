@@ -1,11 +1,11 @@
 import React from 'react';
 import Firebase from './firebase';
+import FirebaseContext from './context'
 
-const FirebaseContext = React.createContext<Firebase | null>(null);
-
-interface WithFirebaseProps {
+export interface WithFirebaseProps {
   firebase: Firebase;
 }
+
 
 export function withFirebase<T extends WithFirebaseProps = WithFirebaseProps>(WrappedComponent: React.ComponentType<T>) {
   const WithFirebase = (props: Omit<T, keyof WithFirebaseProps>) => {
@@ -18,4 +18,4 @@ export function withFirebase<T extends WithFirebaseProps = WithFirebaseProps>(Wr
   return WithFirebase
 }
 
-export default FirebaseContext;
+// export default withFirebase

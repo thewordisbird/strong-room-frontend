@@ -1,17 +1,43 @@
 import app from 'firebase/app';
 import 'firebase/firestore';
-import 'firebase/storage'
+import 'firebase/storage';
 
-import InvoiceData from '../../shared/InvoiceData';
+import firebaseConfig from './config/firebaseConfig'
 
-const config = {
-  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
-  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.REACT_APP_FIREBASE_APP_ID,
-  measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID
+export interface InvoiceData {
+  id?: string;
+  " AvidPay Check #": string;
+  " Cash Account": string;
+  " Cleared Date": string;
+  " Delivery Method": string;
+  " Delivery Status": string;
+  " G/L Amount": string;
+  " Invoice Count": string;
+  " Last Update Date": string;
+  " Pay TransactionId": string;
+  " Payment Amount": string;
+  "Bank Account": string;
+  "Check": string;
+  "Code": string;
+  "Company": string;
+  "Date Paid": string;
+  "G/L Account": string;
+  "Invoice Amount": string;
+  "Invoice Id": string;
+  "Invoice Num": string;
+  "Vendor": string;
+  "checkStubNote": string;
+  "dueDate": string;
+  "internalNote": string;
+  "invoiceDate": string;
+  "pdfId": string;
+  "topsRef": string;
+  "trxnDate": string;
+}
+
+const converter = {
+  toFirestore: (data: InvoiceData) => data,
+  fromFirestore: (snapshot: app.firestore.QueryDocumentSnapshot) => snapshot.data() as InvoiceData
 }
 
 class Firebase {
@@ -19,12 +45,11 @@ class Firebase {
   invoiceCollection: app.firestore.CollectionReference;
   vendors: Invoice[] = [];
   lastQuery: app.firestore.CollectionReference<app.firestore.DocumentData> | app.firestore.Query<app.firestore.DocumentData>;
-
   storage: app.storage.Storage;
   sotragePathRef: app.storage.Reference;
 
   constructor() {
-    app.initializeApp(config);
+    app.initializeApp(firebaseConfig);
 
     this.firestore = app.firestore();
     this.invoiceCollection = this.firestore.collection('invoice')
@@ -32,10 +57,21 @@ class Firebase {
 
     this.storage = app.storage()
     this.sotragePathRef = this.storage.ref()
-    
   }
 
   // *** Firestore API ***
+  // Because this is a realtively small dataset that is read only and will never be updated, Only one databse query is made when the application is loaded.
+  // The data will be stored in an object in local memory and any sort and filtering operations will be performed locally.
+  loadInvoices(){
+    return this.invoiceCollection.withConverter(converter)
+      .get()
+      .then((snapshot) => {
+        const results = snapshot.docs.map(doc => doc.data());
+        return results
+      })
+      .catch(error => console.log(error))
+  }
+
   getVendors = () =>  {
     return this.invoiceCollection.get().then(querySnapshot => {
       const uniqueVendors = new Set<string>()
