@@ -1,4 +1,5 @@
 import app from 'firebase/app';
+import 'firebase/auth';
 import 'firebase/firestore';
 import 'firebase/storage';
 
@@ -41,6 +42,10 @@ const converter = {
 }
 
 class Firebase {
+  
+
+  auth: app.auth.Auth;
+  
   firestore: app.firestore.Firestore;
   invoiceCollection: app.firestore.CollectionReference;
   
@@ -50,11 +55,55 @@ class Firebase {
   constructor() {
     app.initializeApp(firebaseConfig);
 
+    this.auth = app.auth();
+
     this.firestore = app.firestore();
     this.invoiceCollection = this.firestore.collection('invoice')
 
     this.storage = app.storage()
     this.sotragePathRef = this.storage.ref()
+  }
+
+  // *** Auth API ***
+  loginUser(email: string, password: string) {
+    console.log('in loginuser')
+    return this.auth.signInWithEmailAndPassword(email, password)
+      .then(userCredentials => {
+            // User Logged In
+            const user = userCredentials.user
+            if (user) {
+              user.getIdTokenResult().then(tokenResult => {
+                const token = tokenResult.token;
+                const tokenExp = tokenResult.expirationTime
+                localStorage.setItem('token', token);
+                localStorage.setItem('tokenExp', tokenExp);
+                localStorage.setItem('userId', user.uid)
+              })
+            }
+            return user
+          }
+      )
+      .catch(error => {
+        let message = '';
+        
+        switch (error.code) {
+          case 'auth/invalid-email':
+            message = "Invalid email address.";
+            break;
+          case 'auth/user-not-found':
+            message = "Invalid user."
+            break;
+          case 'auth/wrong-password':
+            message = 'Invalid password.';
+            break;
+          default:
+            message = "Unknown Authentication Error."
+        }
+
+        console.log('catch error', error.code, message)
+        throw new Error(message);
+        
+      })
   }
 
   // *** Firestore API ***

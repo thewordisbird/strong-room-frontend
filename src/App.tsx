@@ -6,6 +6,7 @@ import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import Container from '@material-ui/core/Container';
 import InvoiceItems from './views/InvoiceItems/InvoiceItems';
 import InvoiceDetails from './views/InvoiceDetails/InvoiceDetails';
+import Login from './views/Auth/Login';
 
 type AppProps = {};
 
@@ -34,8 +35,10 @@ class App extends Component<AppProps, AppState> {
         <NavBar title="Burbank Square" isAuthenticated={this.state.isAuthenticated}/>
         <Container maxWidth="md">
           <Switch>
+            <Route path="/auth">
+              <Login />
+            </Route>
             <Route path="/details">
-              {/* <Details /> */}
               <InvoiceDetails />
             </Route>
             <Route path="/">
