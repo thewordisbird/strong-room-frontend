@@ -4,7 +4,7 @@ import { withRouter, RouteComponentProps } from 'react-router-dom';
 
 import { TableContainer, LinearProgress, Paper, Table, TableHead, TableRow, TableCell, TableBody, Button, TableFooter, TablePagination } from '@material-ui/core';
 
-import { InvoiceData } from '../../../shared/Firebase/firebase';
+import { InvoiceData } from '../../../shared/Firebase/Firestore/interfaces/InvoiceData';
 
 type SearchResultsProps = RouteComponentProps & {
   loading: boolean;

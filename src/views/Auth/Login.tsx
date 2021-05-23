@@ -3,7 +3,8 @@ import React, { Component } from 'react';
 
 import { withRouter, RouteComponentProps } from 'react-router-dom';
 import { withStyles, WithStyles, createStyles } from '@material-ui/core/styles'
-import { withFirebase, WithFirebaseProps } from '../../shared/Firebase/withFirebase';
+// import { withFirebase, WithFirebaseProps } from '../../shared/Firebase/withFirebase';
+import { withAuth, withAuthProps} from '../../shared/Firebase/Auth/withAuth'
 
 const styles = createStyles({
   root: {
@@ -19,7 +20,7 @@ const styles = createStyles({
   }
 })
 
-type LoginProps = WithStyles<typeof styles> & WithFirebaseProps & RouteComponentProps
+type LoginProps = WithStyles<typeof styles> & RouteComponentProps & withAuthProps
 
 type LoginState = {
   form: {
@@ -68,25 +69,37 @@ class Login extends Component<LoginProps, LoginState>{
 
   handleSubmit = () => {
     console.log('handle submit')
-    const { firebase } = this.props;
+    const { loginUser, history } = this.props
     const { email, password } = this.state.form;
-    
-    if (email && password){
-      firebase.loginUser(email, password).then(resp => {
-        console.log('user logged in')
-        this.props.history.push('/')
-      }).catch(authError => {
-        this.setState(prevState => (
-          {
-            ...prevState,
-            error: {
-              error: true,
-              message: authError.message
-            }
-          }
-        ))
+
+    loginUser(email as string , password as string)
+      .then(user => {
+        history.push('/')
       })
-    }
+      .catch(error => console.log('there was an error', error))
+
+
+    // const { firebase, addUser } = this.props;
+    // const { email, password } = this.state.form;
+    
+    // if (email && password){
+    //   firebase.loginUser(email, password).then(user => {
+    //     console.log('user logged in')
+    //     // add user to auth context 
+    //     addUser(user)
+    //     this.props.history.push('/')
+    //   }).catch(authError => {
+    //     this.setState(prevState => (
+    //       {
+    //         ...prevState,
+    //         error: {
+    //           error: true,
+    //           message: authError.message
+    //         }
+    //       }
+    //     ))
+    //   })
+    // }
   }
 
   render() {
@@ -140,4 +153,4 @@ class Login extends Component<LoginProps, LoginState>{
   }
 }
 
-export default withRouter(withStyles(styles)(withFirebase(Login)));
+export default withRouter(withStyles(styles)(withAuth(Login)));

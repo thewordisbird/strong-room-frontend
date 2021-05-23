@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 
-import { withFirebase, WithFirebaseProps } from '../../shared/Firebase/withFirebase'
+import { withFirestore, withFirestoreProps } from '../../shared/Firebase/Firestore/withFirestore';
 
 import InvoiceSearch from './InvoiceSearch/InvoiceSearch'
 import SearchResults from './SearchResults/SearchResults';
 
-import { InvoiceData } from '../../shared/Firebase/firebase';
+import { InvoiceData } from '../../shared/Firebase/Firestore/interfaces/InvoiceData';
 
-type InvoiceItemsProps = WithFirebaseProps
+type InvoiceItemsProps = withFirestoreProps
 
 type InvoiceItemsState = {
   isLoading: {
@@ -88,7 +88,7 @@ class InvoiceItems extends Component<InvoiceItemsProps, InvoiceItemsState>{
       }
     ))
 
-    const invoices = await this.props.firebase.getInvoices();
+    const invoices = await this.props.getInvoices();
     
     if (invoices) {
       const vendors = uniqueVendors(invoices)
@@ -160,4 +160,4 @@ class InvoiceItems extends Component<InvoiceItemsProps, InvoiceItemsState>{
   };
 };
 
-export default withFirebase(InvoiceItems);
+export default withFirestore(InvoiceItems);

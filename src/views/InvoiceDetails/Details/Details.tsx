@@ -4,7 +4,7 @@ import { withStyles, WithStyles, createStyles } from '@material-ui/core/styles'
 
 import PictureAsPdfIcon from '@material-ui/icons/PictureAsPdf';
 import { Grid, Typography, Card, CardContent } from '@material-ui/core';
-import { InvoiceData } from '../../../shared/Firebase/firebase';
+import { InvoiceData } from '../../../shared/Firebase/Firestore/interfaces/InvoiceData';
 
 const styles = createStyles({
   root: {

@@ -1,9 +1,11 @@
-import React from 'react'
+import React, { useEffect} from 'react'
 
 import { withStyles, WithStyles, createStyles } from '@material-ui/core/styles'
-
+import { withRouter, RouteComponentProps } from 'react-router-dom';
+import { withAuth, withAuthProps } from '../Firebase/Auth/withAuth';
 import { NavLink } from 'react-router-dom';
 import { AppBar, Container, Toolbar, Typography, Button } from '@material-ui/core'
+
 
 const styles = createStyles({
   root: {
@@ -31,12 +33,24 @@ const styles = createStyles({
   }
 })
 
-type NavBarProps = WithStyles<typeof styles> & {
+type NavBarProps = WithStyles<typeof styles>  & RouteComponentProps & withAuthProps & {
   title: string;
-  isAuthenticated: boolean
 }
 
-const NavBar = ({title, isAuthenticated, classes}: NavBarProps ) => (
+const NavBar: React.FC<NavBarProps> = (props: NavBarProps) => {
+  const {logoutUser, isAuthenticated, title,  history, classes } = props
+  const handleLogout = () => {
+    logoutUser().then(() => {
+      history.push('/auth')
+    })
+    
+  }
+
+  useEffect(() => {
+    console.log('props changed', props)
+  },[props])
+
+  return (
   <div className={classes.root}>
     <AppBar position="static">
       <Container maxWidth="md">
@@ -52,13 +66,13 @@ const NavBar = ({title, isAuthenticated, classes}: NavBarProps ) => (
                 <Typography>
                   <NavLink className={classes.navLink} to="/" activeClassName={classes.selected} exact>Invoices</NavLink>
                 </Typography>
-                <Button color="inherit">Logout</Button>
+                <Button color="inherit" onClick={handleLogout}>Logout</Button>
               </>)
           : <Button color="inherit">Login</Button> }
         </Toolbar>
       </Container>
     </AppBar>
   </div>
-)
+)}
 
-export default withStyles(styles)(NavBar);
+export default withRouter(withStyles(styles)(withAuth(NavBar)));

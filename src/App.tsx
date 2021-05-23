@@ -1,54 +1,56 @@
 import React, { Component } from 'react';
 
+import { withAuth, withAuthProps } from './shared/Firebase/Auth/withAuth';
+
 import NavBar from './shared/Navbar/Navbar';
 
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom"; 
+import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-dom"; 
 import Container from '@material-ui/core/Container';
 import InvoiceItems from './views/InvoiceItems/InvoiceItems';
 import InvoiceDetails from './views/InvoiceDetails/InvoiceDetails';
 import Login from './views/Auth/Login';
+// import {withFirebase, WithFirebaseProps } from './shared/Firebase/withFirebase';
+// import { withFirestore, withFirestoreProps } from './shared/Firebase/Firestore/withFirestore';
 
-type AppProps = {};
+type AppProps = withAuthProps;
 
 type AppState = {
   searchQuery: {vendor?: string | null, startDate?: Date | null, endDate?: Date | null}
-  isAuthenticated: boolean;
 }
 
 class App extends Component<AppProps, AppState> {
   state = {
-    searchQuery: {},
-    isAuthenticated: true
+    searchQuery: {}
   }
-
-  onSearchParamChange = (params : {vendor?: string | null, startDate?: Date | null, endDate?: Date | null}) => {
-    this.setState({
-      searchQuery: {
-        ...params
-      }
-    })
+  
+  componentDidMount() {
+    console.log('mounting app')
   }
 
   render() {
+    const { isAuthenticated } = this.props
+    const routes = isAuthenticated
+      ? (
+        <Switch>
+            <Route path="/details"><InvoiceDetails /></Route>
+            <Route path="/"><InvoiceItems /></Route>
+          </Switch>
+        )
+      : (
+        <Switch>
+            <Route path="/auth"><Login /></Route>
+            <Redirect to="/auth" />
+          </Switch>
+      )
     return (
       <Router>
-        <NavBar title="Burbank Square" isAuthenticated={this.state.isAuthenticated}/>
+        <NavBar title="Burbank Square"/>
         <Container maxWidth="md">
-          <Switch>
-            <Route path="/auth">
-              <Login />
-            </Route>
-            <Route path="/details">
-              <InvoiceDetails />
-            </Route>
-            <Route path="/">
-              <InvoiceItems />
-            </Route>
-          </Switch>
+          { routes }
         </Container>
       </Router>
     );
   }
 }
 
-export default App;
+export default withAuth(App);

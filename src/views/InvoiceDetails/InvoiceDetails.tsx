@@ -2,12 +2,14 @@ import React, { Component } from 'react';
 
 import { withStyles, WithStyles, createStyles } from '@material-ui/core/styles'
 import { Switch, Route, withRouter, RouteComponentProps} from 'react-router-dom'
-import { withFirebase, WithFirebaseProps } from '../../shared/Firebase/withFirebase';
+// import { withFirebase, WithFirebaseProps } from '../../shared/Firebase/withFirebase';
+import { withFirestore, withFirestoreProps } from '../../shared/Firebase/Firestore/withFirestore'
+import { withStorage, withStorageProps } from '../../shared/Firebase/Storage/withStorage';
 
 import Details from './Details/Details';
 import { LinearProgress } from '@material-ui/core';
 
-import { InvoiceData } from '../../shared/Firebase/firebase';
+import { InvoiceData } from '../../shared/Firebase/Firestore/interfaces/InvoiceData';
 
 const styles = createStyles({
   root: {
@@ -20,7 +22,7 @@ const styles = createStyles({
   }
 })
 
-type InvoiceDetailsProps = RouteComponentProps & WithFirebaseProps & WithStyles<typeof styles>
+type InvoiceDetailsProps = RouteComponentProps &  WithStyles<typeof styles> & withFirestoreProps & withStorageProps
 
 type InvoiceDetailsState = {
   isLoading: boolean
@@ -39,12 +41,12 @@ class InvoiceDetails extends Component<InvoiceDetailsProps, InvoiceDetailsState>
 
   async componentDidMount() {
     this.setState({isLoading: true})
-    const { location, firebase } = this.props
+    const { location, getInvoice, getPdfUrl } = this.props
     const id = location.pathname.split('/')[2]
 
     try {
-      const invoiceData = await firebase.getInvoice(id)
-      const pdfUrl = await firebase.getPdfUrl(invoiceData.pdfId)
+      const invoiceData = await getInvoice(id)
+      const pdfUrl = await getPdfUrl(invoiceData.pdfId) as string
 
       this.setState({
         isLoading: false,
@@ -85,4 +87,4 @@ class InvoiceDetails extends Component<InvoiceDetailsProps, InvoiceDetailsState>
     }  
   }
 
-export default withStyles(styles)(withRouter(withFirebase(InvoiceDetails)));
+export default withStyles(styles)(withRouter(withFirestore(withStorage(InvoiceDetails))));
