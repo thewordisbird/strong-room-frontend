@@ -9,22 +9,16 @@ import Container from '@material-ui/core/Container';
 import InvoiceItems from './views/InvoiceItems/InvoiceItems';
 import InvoiceDetails from './views/InvoiceDetails/InvoiceDetails';
 import Login from './views/Auth/Login';
-// import {withFirebase, WithFirebaseProps } from './shared/Firebase/withFirebase';
-// import { withFirestore, withFirestoreProps } from './shared/Firebase/Firestore/withFirestore';
 
 type AppProps = withAuthProps;
 
 type AppState = {
-  searchQuery: {vendor?: string | null, startDate?: Date | null, endDate?: Date | null}
+  searchQuery: {vendor?: string | null, startDate?: Date | null, endDate?: Date | null};
 }
 
 class App extends Component<AppProps, AppState> {
   state = {
     searchQuery: {}
-  }
-  
-  componentDidMount() {
-    console.log('mounting app')
   }
 
   render() {
@@ -38,10 +32,11 @@ class App extends Component<AppProps, AppState> {
         )
       : (
         <Switch>
-            <Route path="/auth"><Login /></Route>
-            <Redirect to="/auth" />
+            <Route path="/"><Login /></Route>
+            <Redirect to="/" />
           </Switch>
       )
+
     return (
       <Router>
         <NavBar title="Burbank Square"/>

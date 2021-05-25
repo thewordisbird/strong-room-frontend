@@ -8,13 +8,7 @@ export const loginUser = (email: string, password: string): Promise<firebase.Use
             // User Logged In
             const user = userCredentials.user
             if (user) {
-              user.getIdTokenResult().then(tokenResult => {
-                const token = tokenResult.token;
-                const tokenExp = tokenResult.expirationTime
-                localStorage.setItem('sr-token', token);
-                localStorage.setItem('sr-tokenExp', tokenExp);
-                localStorage.setItem('sr-userId', user.uid)
-              })
+              setUser(user)
             }
             return user
           }
@@ -49,14 +43,25 @@ export const loginUser = (email: string, password: string): Promise<firebase.Use
     )
   }
 
-  export const autoLogin = () => {
-    // If there is user information in local storage,
-    //  - check the token and expiration
-    //  - issue new token
-    //  - update local storage cookies
-    //  - login user
+  export const authCheckState = ( stateSetter: (user: firebase.User | null) => void) => {
+    return auth.onAuthStateChanged(async(user) => {
+      if (user) {
+        setUser(user)
+        stateSetter(user)
+      } else {
+        await logoutUser()
+      }
+    })
   }
 
-  export const autoLogout = () => {
-    // used by interceptor middlewear to confirm user is valid for any request
+  const setUser = (user: firebase.User): void => {
+    user.getIdTokenResult().then(tokenResult => {
+      const token = tokenResult.token;
+      const tokenExp = tokenResult.expirationTime
+      localStorage.setItem('sr-token', token);
+      localStorage.setItem('sr-tokenExp', tokenExp);
+      localStorage.setItem('sr-userId', user.uid)
+    })
   }
+
+  

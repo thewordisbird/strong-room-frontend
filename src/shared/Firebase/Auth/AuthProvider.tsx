@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import firebase from 'firebase'
 import {AuthContext} from './AuthContext';
-import { loginUser, logoutUser } from './authAPI';
+import { authCheckState, loginUser, logoutUser } from './authAPI';
 
 type AuthProviderProps = {
   children: React.ReactNode;
@@ -9,27 +9,34 @@ type AuthProviderProps = {
 
 type AuthProviderState = {
   user: firebase.User | null;
+  loadingAuth: boolean;
 }
 
 
 export class AuthProvider extends Component<AuthProviderProps, AuthProviderState> {
   state: AuthProviderState = {
-    user: null
+    user: null,
+    loadingAuth: true
   }
 
-  // authListener = firebase.auth().onAuthStateChanged(user => {
-  //   this.setState({user: user})
-  //   console.log(this.state)
-  // })
+  authStateCheckSub: firebase.Unsubscribe | null = null;
 
-  // componentDidMount() {
-  //   console.log('auth provider')
-  //   this.authListener()
-  // }
+  componentDidMount() {
+    console.log('authProvider CDM')
+    this.authStateCheckSub = authCheckState(this.setStateAfterAuthStateCheck)
+  }
 
-  // componentWillUnmount() {
-  //   this.authListener()
-  // }
+  componentWillUnmount() {
+    console.log('unsubscribing')
+    if (this.authStateCheckSub) {
+      this.authStateCheckSub()
+    }
+  }
+
+
+  setStateAfterAuthStateCheck = (user: firebase.User | null) => {
+    this.setState({user: user, loadingAuth: false})
+  }
 
   onLogin = (email: string, password: string) => {
     console.log('logging in')
@@ -46,6 +53,8 @@ export class AuthProvider extends Component<AuthProviderProps, AuthProviderState
         this.setState({user: null})
       })
     }
+
+  
 
   render () {
     return (

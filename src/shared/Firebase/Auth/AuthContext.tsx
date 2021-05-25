@@ -5,6 +5,7 @@ export type authContextProps = {
   user: firebase.User | null;
   loginUser: (email: string, password: string) => Promise<void>;
   logoutUser: () => Promise<void>;
+  loadingAuth: boolean;
   isAuthenticated: boolean
 };
 
