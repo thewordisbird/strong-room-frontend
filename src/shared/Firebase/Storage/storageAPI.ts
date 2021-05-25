@@ -5,7 +5,7 @@ const storage = firebase.storage()
 const storagePathRef = storage.ref()
 
 export const getPdfUrl = (invoiceId: string): Promise<void | string> => {
-  const storageRef = storagePathRef.child(invoiceId)
+  const storageRef = storagePathRef.child(`${invoiceId}.pdf`)
 
   return storageRef.getDownloadURL()
     .then((url: string )=> url)
