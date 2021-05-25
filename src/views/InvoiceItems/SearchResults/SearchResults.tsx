@@ -34,9 +34,12 @@ class SearchResults extends Component<SearchResultsProps, SearchResultsState> {
   onChangeRowsPerPage = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
+    console.log('rows per page - in', event.target.value)
+    const rowsPerPage = event.target.value === "-1" ? this.props.invoices.length : parseInt(event.target.value, 10)
+    console.log('rows per page - out', rowsPerPage)
     this.setState(
       {
-        rowsPerPage: parseInt(event.target.value, 10),
+        rowsPerPage: rowsPerPage,
         page: 0
       }
     )
@@ -94,7 +97,7 @@ class SearchResults extends Component<SearchResultsProps, SearchResultsState> {
                 rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
                 colSpan={3}
                 count={invoices.length}
-                rowsPerPage={this.state.rowsPerPage}
+                rowsPerPage={this.state.rowsPerPage > 25 ? -1 : this.state.rowsPerPage}
                 page={this.state.page}
                 SelectProps={{
                   inputProps: { 'aria-label': 'rows per page' },
