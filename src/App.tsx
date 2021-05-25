@@ -1,14 +1,11 @@
 import React, { Component } from 'react';
-
-import { withAuth, withAuthProps } from './shared/Firebase/Auth/withAuth';
-
 import NavBar from './shared/Navbar/Navbar';
-
-import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-dom"; 
-import Container from '@material-ui/core/Container';
 import InvoiceItems from './views/InvoiceItems/InvoiceItems';
 import InvoiceDetails from './views/InvoiceDetails/InvoiceDetails';
 import Login from './views/Auth/Login';
+import Container from '@material-ui/core/Container';
+import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-dom"; 
+import { withAuth, withAuthProps } from './shared/Firebase/Auth/withAuth';
 
 type AppProps = withAuthProps;
 

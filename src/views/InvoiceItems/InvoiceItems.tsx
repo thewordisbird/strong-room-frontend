@@ -1,10 +1,7 @@
 import React, { Component } from 'react';
-
-import { withFirestore, withFirestoreProps } from '../../shared/Firebase/Firestore/withFirestore';
-
 import InvoiceSearch from './InvoiceSearch/InvoiceSearch'
 import SearchResults from './SearchResults/SearchResults';
-
+import { withFirestore, withFirestoreProps } from '../../shared/Firebase/Firestore/withFirestore';
 import { InvoiceData } from '../../shared/Firebase/Firestore/interfaces/InvoiceData';
 
 type InvoiceItemsProps = withFirestoreProps
@@ -125,7 +122,6 @@ class InvoiceItems extends Component<InvoiceItemsProps, InvoiceItemsState>{
     //      will still have the same problem for any filtering.
     if (prevState.searchParams !== this.state.searchParams) {
       const results = filterInvoiceData(this.state.queryData.invoices, this.state.searchParams)
-      console.log(results)
       this.setState(prevState => (
         {
           ...prevState,

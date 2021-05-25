@@ -1,14 +1,10 @@
 import React, { Component } from 'react';
-
-import { withStyles, WithStyles, createStyles } from '@material-ui/core/styles'
-import { Switch, Route, withRouter, RouteComponentProps} from 'react-router-dom'
-// import { withFirebase, WithFirebaseProps } from '../../shared/Firebase/withFirebase';
-import { withFirestore, withFirestoreProps } from '../../shared/Firebase/Firestore/withFirestore'
-import { withStorage, withStorageProps } from '../../shared/Firebase/Storage/withStorage';
-
 import Details from './Details/Details';
 import { LinearProgress } from '@material-ui/core';
-
+import { withStyles, WithStyles, createStyles } from '@material-ui/core/styles'
+import { Switch, Route, withRouter, RouteComponentProps} from 'react-router-dom'
+import { withFirestore, withFirestoreProps } from '../../shared/Firebase/Firestore/withFirestore'
+import { withStorage, withStorageProps } from '../../shared/Firebase/Storage/withStorage';
 import { InvoiceData } from '../../shared/Firebase/Firestore/interfaces/InvoiceData';
 
 const styles = createStyles({
@@ -66,7 +62,6 @@ class InvoiceDetails extends Component<InvoiceDetailsProps, InvoiceDetailsState>
     const { match, classes } = this.props
     
     let content = <LinearProgress className={classes.loading}/>
-    //TODO: abstract using routing gaurd to validate invoice
     if (!this.state.isLoading && !this.state.redirect) {
       content = (
         <Switch>

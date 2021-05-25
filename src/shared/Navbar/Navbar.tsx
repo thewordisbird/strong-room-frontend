@@ -1,4 +1,4 @@
-import React, { useEffect} from 'react'
+import React from 'react'
 
 import { withStyles, WithStyles, createStyles } from '@material-ui/core/styles'
 import { withRouter, RouteComponentProps } from 'react-router-dom';
@@ -42,13 +42,8 @@ const NavBar: React.FC<NavBarProps> = (props: NavBarProps) => {
   const handleLogout = () => {
     logoutUser().then(() => {
       history.push('/auth')
-    })
-    
+    }) 
   }
-
-  useEffect(() => {
-    console.log('props changed', props)
-  },[props])
 
   return (
   <div className={classes.root}>

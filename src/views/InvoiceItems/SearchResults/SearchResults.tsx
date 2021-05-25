@@ -23,7 +23,6 @@ class SearchResults extends Component<SearchResultsProps, SearchResultsState> {
   }
 
   onSelect = (id: string | undefined) => {
-    console.log(id)
     this.props.history.push(`/details/${id}`)
   }
 
@@ -34,9 +33,7 @@ class SearchResults extends Component<SearchResultsProps, SearchResultsState> {
   onChangeRowsPerPage = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
-    console.log('rows per page - in', event.target.value)
     const rowsPerPage = event.target.value === "-1" ? this.props.invoices.length : parseInt(event.target.value, 10)
-    console.log('rows per page - out', rowsPerPage)
     this.setState(
       {
         rowsPerPage: rowsPerPage,
@@ -49,7 +46,6 @@ class SearchResults extends Component<SearchResultsProps, SearchResultsState> {
     const invoiceCount = this.props.invoices.length
     const startIndex = this.state.page === 0 ? 0 : this.state.page * this.state.rowsPerPage + 1
     const endIndex = startIndex + this.state.rowsPerPage + 1 < invoiceCount ? startIndex + this.state.rowsPerPage + 1: invoiceCount
-    console.log(startIndex, endIndex)
     return this.props.invoices.slice(startIndex, endIndex).map(invoice => (
       {
         id: invoice['id'],
@@ -67,7 +63,6 @@ class SearchResults extends Component<SearchResultsProps, SearchResultsState> {
 
     if (!loading) {
       const rowData = this.getRowData();
-      console.log(rowData)
       content = (
         <TableContainer component={Paper}>
         <Table className="table" aria-label="simple table">

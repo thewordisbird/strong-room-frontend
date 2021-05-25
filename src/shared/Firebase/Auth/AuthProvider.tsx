@@ -22,24 +22,20 @@ export class AuthProvider extends Component<AuthProviderProps, AuthProviderState
   authStateCheckSub: firebase.Unsubscribe | null = null;
 
   componentDidMount() {
-    console.log('authProvider CDM')
     this.authStateCheckSub = authCheckState(this.setStateAfterAuthStateCheck)
   }
 
   componentWillUnmount() {
-    console.log('unsubscribing')
     if (this.authStateCheckSub) {
       this.authStateCheckSub()
     }
   }
-
 
   setStateAfterAuthStateCheck = (user: firebase.User | null) => {
     this.setState({user: user, loadingAuth: false})
   }
 
   onLogin = (email: string, password: string) => {
-    console.log('logging in')
     return loginUser(email, password)
       .then(user => {
         this.setState({user: user})
@@ -47,14 +43,11 @@ export class AuthProvider extends Component<AuthProviderProps, AuthProviderState
   }
 
   onLogout = () => {
-    console.log('logging out')
     return logoutUser()
       .then(() => {
         this.setState({user: null})
       })
     }
-
-  
 
   render () {
     return (

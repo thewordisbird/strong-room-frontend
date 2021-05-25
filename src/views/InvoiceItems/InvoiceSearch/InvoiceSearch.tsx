@@ -18,7 +18,6 @@ const styles = createStyles({
 })
 
 type SearchProps = WithStyles<typeof styles> & {
-  // onChange: (params: {vendor?: string | null, startDate?: Date | null, endDate?: Date | null}) => void;
   loading: boolean;
   vendors: string[];
   searchParams: {vendor: string | null, startDate: Date | null, endDate: Date | null}
