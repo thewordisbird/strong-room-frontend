@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
+import React, {  useState } from 'react';
 import { Button, Card, CardContent, Grid, TextField } from '@material-ui/core';
-import { withRouter, RouteComponentProps } from 'react-router-dom';
-import { withStyles, WithStyles, createStyles } from '@material-ui/core/styles'
-import { withAuth, withAuthProps} from '../../shared/Firebase/Auth/withAuth'
+import { useHistory } from 'react-router-dom';
+import { makeStyles } from '@material-ui/core/styles'; 
+import { useAuth } from '../../shared/Firebase/Auth/useAuth';
 
-const styles = createStyles({
+const useStyles = makeStyles({
   root: {
     marginTop: '32px',
     marginBottom: '24px'
@@ -18,113 +18,91 @@ const styles = createStyles({
   }
 })
 
-type LoginProps = WithStyles<typeof styles> & RouteComponentProps & withAuthProps
+const Login: React.FC = () => {
+  const [form, setForm] = useState({
+    email: '',
+    password: ''
+  })
 
-type LoginState = {
-  form: {
-    email: string | null;
-    password: string | null;
-  },
-  error: {
-    error: boolean,
-    message: string
-  }
-}
+  const [error, setError] = useState<string | null>(null)
 
-class Login extends Component<LoginProps, LoginState>{
-  state: LoginState = {
-    form: {
-      email: '',
-      password: ''
-    },
-    error: {
-      error: false,
-      message: ''
-    }
-  }
+  const { loginUser } = useAuth();
 
-  handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState(prevState => (
+  const classes = useStyles()
+  const history = useHistory();
+
+  const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setForm(prevState => (
       {
-        form: {
-          ...prevState.form,
-          email: event.target.value
-        }
+        ...prevState,
+        email: event.target.value
       }
     ))
   }
 
-  handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState(prevState => (
+  const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setForm(prevState => (
       {
-        form: {
-          ...prevState.form,
-          password: event.target.value
-        }
+        ...prevState,
+        password: event.target.value
       }
     ))
   }
 
-  handleSubmit = () => {
-    const { loginUser, history } = this.props
-    const { email, password } = this.state.form;
-
-    loginUser(email as string , password as string)
-      .then(user => {
+  const handleSubmit = () => {
+    loginUser(form.email as string , form.password as string)
+      .then(() => {
         history.push('/')
       })
-      .catch(error => console.log('there was an error', error))
+      .catch(error => {
+        setError(error)
+      })
   }
 
-  render() {
-    const { classes } = this.props;
-
-    return (
-      <div className={classes.root}>
-        <Card className={classes.card}>
-          <CardContent>
-          <Grid container spacing={3}>
-            { this.state.error.error && (
-                <Grid item xs={12}>
-                <Card className={classes.error}>
-                  <CardContent>
-                    {this.state.error.message}
-                  </CardContent>
-                </Card>
-              </Grid>
-              )
-            }
-            
-            <Grid item xs={12}>
-              <TextField 
-                fullWidth 
-                required 
-                id="standard-required" 
-                label="Email" 
-                onChange={this.handleEmailChange}/
-              >
+  return (
+    <div className={classes.root}>
+      <Card className={classes.card}>
+        <CardContent>
+        <Grid container spacing={3}>
+          {error && (
+              <Grid item xs={12}>
+              <Card className={classes.error}>
+                <CardContent>
+                  {error}
+                </CardContent>
+              </Card>
             </Grid>
-            <Grid item xs={12}>
-            <TextField
-            fullWidth
-              id="standard-password-input"
-              required
-              label="Password"
-              type="password"
-              autoComplete="current-password"
-              onChange={this.handlePasswordChange}
+            )
+          }
+          
+          <Grid item xs={12}>
+            <TextField 
+              fullWidth 
+              required 
+              id="standard-required" 
+              label="Email" 
+              onChange={handleEmailChange}
             />
-            </Grid>
-            <Grid item xs={12}>
-          <Button fullWidth variant="contained" color="primary" onClick={this.handleSubmit}>Login</Button>
           </Grid>
+          <Grid item xs={12}>
+          <TextField
+          fullWidth
+            id="standard-password-input"
+            required
+            label="Password"
+            type="password"
+            autoComplete="current-password"
+            onChange={handlePasswordChange}
+          />
           </Grid>
-          </CardContent>
-
-        </Card>
-      </div>
-    )
-  }
+          <Grid item xs={12}>
+        <Button fullWidth variant="contained" color="primary" onClick={handleSubmit}>Login</Button>
+        </Grid>
+        </Grid>
+        </CardContent>
+      </Card>
+    </div>
+  )
 }
 
-export default withRouter(withStyles(styles)(withAuth(Login)));
+export default Login;

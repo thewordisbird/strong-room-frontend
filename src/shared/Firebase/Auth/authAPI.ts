@@ -2,18 +2,17 @@ import firebase from '../firebase';
 import 'firebase/auth'
 const auth = firebase.auth()
 
-export const loginUser = (email: string, password: string): Promise<firebase.User | null> => {
-    return auth.signInWithEmailAndPassword(email, password)
-      .then(userCredentials => {
-            // User Logged In
-            const user = userCredentials.user
-            if (user) {
-              setUser(user)
-            }
-            return user
-          }
-      )
-      .catch(error => {
+export const loginUser = (email: string, password: string): Promise<void> => {
+
+    return new Promise(async (resolve, reject) => {
+      try {
+        const userCredentials = await auth.signInWithEmailAndPassword(email, password)
+        const user = userCredentials.user
+        if (user) {
+          setUser(user)
+          resolve()
+        }
+      } catch (error) {
         let message = '';
         
         switch (error.code) {
@@ -30,9 +29,9 @@ export const loginUser = (email: string, password: string): Promise<firebase.Use
             message = "Unknown Authentication Error."
         }
 
-        console.log('catch error', error.code, message)
-        throw new Error(message);
-      })
+        reject(message)
+      }
+    })
   }
 
   export const logoutUser = () => {
@@ -43,14 +42,16 @@ export const loginUser = (email: string, password: string): Promise<firebase.Use
     )
   }
 
-  export const authCheckState = ( stateSetter: (user: firebase.User | null) => void) => {
-    return auth.onAuthStateChanged(async(user) => {
-      if (user) {
-        setUser(user)
-        stateSetter(user)
-      } else {
-        await logoutUser()
-      }
+  export const authCheckState = ():Promise<firebase.User | void> => {
+    // TODO: convert to promise
+    return new Promise((resolve, reject) => {
+      auth.onAuthStateChanged(user => {
+        if (user) {
+          resolve(user)
+        } else {
+          reject()
+        }
+      })
     })
   }
 

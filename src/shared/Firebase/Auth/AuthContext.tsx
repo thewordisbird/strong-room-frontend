@@ -6,7 +6,7 @@ export type authContextProps = {
   loginUser: (email: string, password: string) => Promise<void>;
   logoutUser: () => Promise<void>;
   loadingAuth: boolean;
-  isAuthenticated: boolean
+  isAuthenticated: boolean;
 };
 
 export const AuthContext = React.createContext<Partial<authContextProps>>({});

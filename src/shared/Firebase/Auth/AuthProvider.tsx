@@ -22,13 +22,13 @@ export class AuthProvider extends Component<AuthProviderProps, AuthProviderState
   authStateCheckSub: firebase.Unsubscribe | null = null;
 
   componentDidMount() {
-    this.authStateCheckSub = authCheckState(this.setStateAfterAuthStateCheck)
+    //  authCheckState(this.setStateAfterAuthStateCheck)
   }
 
   componentWillUnmount() {
-    if (this.authStateCheckSub) {
-      this.authStateCheckSub()
-    }
+    // if (this.authStateCheckSub) {
+    //   this.authStateCheckSub()
+    // }
   }
 
   setStateAfterAuthStateCheck = (user: firebase.User | null) => {
@@ -38,7 +38,7 @@ export class AuthProvider extends Component<AuthProviderProps, AuthProviderState
   onLogin = (email: string, password: string) => {
     return loginUser(email, password)
       .then(user => {
-        this.setState({user: user})
+        this.setState({user: null})
       })
   }
 
