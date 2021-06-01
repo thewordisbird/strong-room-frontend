@@ -2,7 +2,7 @@ import React, {  useState } from 'react';
 import { Button, Card, CardContent, Grid, TextField } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles'; 
-import { useAuth } from '../../shared/Firebase/Auth/useAuth';
+import { useAuth } from '../../shared/Firebase/Auth/AuthProvider';
 
 const useStyles = makeStyles({
   root: {
@@ -26,7 +26,7 @@ const Login: React.FC = () => {
 
   const [error, setError] = useState<string | null>(null)
 
-  const { loginUser } = useAuth();
+  const { login } = useAuth();
 
   const classes = useStyles()
   const history = useHistory();
@@ -50,8 +50,9 @@ const Login: React.FC = () => {
   }
 
   const handleSubmit = () => {
-    loginUser(form.email as string , form.password as string)
+    login(form.email as string , form.password as string)
       .then(() => {
+        console.log('loggin in')
         history.push('/')
       })
       .catch(error => {

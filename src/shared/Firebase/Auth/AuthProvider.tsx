@@ -1,69 +1,86 @@
-import React, { Component } from 'react';
+import React, {useContext, useState, useEffect } from 'react';
 import firebase from 'firebase'
-import {AuthContext} from './AuthContext';
 import { authCheckState, loginUser, logoutUser } from './authAPI';
+import PageLoading from '../../PageLoading/PageLoading';
 
-type AuthProviderProps = {
+const AuthContext = React.createContext({});
+
+type authProviderProps = {
   children: React.ReactNode;
 };
 
-type AuthProviderState = {
-  user: firebase.User | null;
-  loadingAuth: boolean;
-}
+export function AuthProvider (props: authProviderProps) {
+  const [user, setUser] = useState<firebase.User | null>(null);
+  const [loadingAuth, setLoadingAuth] = useState<boolean>(true)
 
-
-export class AuthProvider extends Component<AuthProviderProps, AuthProviderState> {
-  state: AuthProviderState = {
-    user: null,
-    loadingAuth: true
-  }
-
-  authStateCheckSub: firebase.Unsubscribe | null = null;
-
-  componentDidMount() {
-    //  authCheckState(this.setStateAfterAuthStateCheck)
-  }
-
-  componentWillUnmount() {
-    // if (this.authStateCheckSub) {
-    //   this.authStateCheckSub()
-    // }
-  }
-
-  setStateAfterAuthStateCheck = (user: firebase.User | null) => {
-    this.setState({user: user, loadingAuth: false})
-  }
-
-  onLogin = (email: string, password: string) => {
-    return loginUser(email, password)
+  useEffect(() => { 
+    // Trigger observer to monitor firebase auth state. 
+    // Note: I think this should run every render, this will ensure that 
+    // for any time AuthProvider is rendered the auth state will be called.
+    // Asses as progress is made, might only want to run once on initial render.
+    authCheckState()
       .then(user => {
-        this.setState({user: null})
-      })
-  }
-
-  onLogout = () => {
-    return logoutUser()
-      .then(() => {
-        this.setState({user: null})
-      })
-    }
-
-  render () {
-    return (
-      <AuthContext.Provider 
-        value={
-          {
-            user: this.state.user, 
-            loginUser: this.onLogin,
-            logoutUser: this.onLogout,
-            isAuthenticated: this.state.user !== null,
-          }
+        if (user) {
+          console.log('setting user')
+          setUser(user)
+          setLoadingAuth(false)
         }
-      >
-        {this.props.children}
-      </AuthContext.Provider>
-    );
+        
+      })
+      .catch(() => {
+        setUser(null)
+        setLoadingAuth(false)
+      })
+  })
+
+  function login (email: string, password: string): Promise<void> {
+    return new Promise (async (resolve, reject) => {
+      try {
+        const user = await loginUser(email, password)
+        setUser(user as firebase.User) 
+        resolve();
+      } catch (error) {
+        reject(error)
+      } 
+    })
   }
+
+  function logout (): Promise<void> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        await logoutUser()
+        setUser(null)
+      } catch (error) {
+        reject(error)
+      }
+    })
+  }
+
+  // Return global loading page while checking auth status.
+  if (loadingAuth) {
+    return <PageLoading />
+  }
+
+  return (
+    <AuthContext.Provider 
+      value={
+        {
+          isAuthenticated: !!user,
+          login: login,
+          logout: logout
+        }
+      } 
+      {...props} 
+    >
+      {props.children}
+    </AuthContext.Provider>
+  )
 }
 
+type useAuthProps = {
+  isAuthenticated: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
+}
+
+export const useAuth = () => useContext(AuthContext) as useAuthProps

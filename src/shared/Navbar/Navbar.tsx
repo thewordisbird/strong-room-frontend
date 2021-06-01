@@ -1,13 +1,12 @@
 import React from 'react'
 
-import { withStyles, WithStyles, createStyles } from '@material-ui/core/styles'
-import { withRouter, RouteComponentProps } from 'react-router-dom';
-import { withAuth, withAuthProps } from '../Firebase/Auth/withAuth';
+import { makeStyles } from '@material-ui/core/styles'; 
+import { useHistory } from 'react-router-dom';
 import { NavLink } from 'react-router-dom';
 import { AppBar, Container, Toolbar, Typography, Button } from '@material-ui/core'
+import { useAuth } from '../Firebase/Auth/AuthProvider';
 
-
-const styles = createStyles({
+const useStyles = makeStyles({
   root: {
     flexGrow: 1,
   },
@@ -33,14 +32,19 @@ const styles = createStyles({
   }
 })
 
-type NavBarProps = WithStyles<typeof styles>  & RouteComponentProps & withAuthProps & {
+type NavBarProps = {
   title: string;
 }
 
 const NavBar: React.FC<NavBarProps> = (props: NavBarProps) => {
-  const {logoutUser, isAuthenticated, title,  history, classes } = props
+  const { title } = props;
+  const classes = useStyles()
+  const history = useHistory()
+  const { isAuthenticated, logout } = useAuth()
+
   const handleLogout = () => {
-    logoutUser().then(() => {
+    console.log('loggin out user')
+    logout().then(() => {
       history.push('/auth')
     }) 
   }
@@ -70,4 +74,4 @@ const NavBar: React.FC<NavBarProps> = (props: NavBarProps) => {
   </div>
 )}
 
-export default withRouter(withStyles(styles)(withAuth(NavBar)));
+export default NavBar;

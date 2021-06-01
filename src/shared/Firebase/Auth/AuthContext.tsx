@@ -2,10 +2,9 @@ import React from 'react';
 import firebase from 'firebase'
 
 export type authContextProps = {
-  user: firebase.User | null;
-  loginUser: (email: string, password: string) => Promise<void>;
-  logoutUser: () => Promise<void>;
-  loadingAuth: boolean;
+  user?: firebase.User | null;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
   isAuthenticated: boolean;
 };
 

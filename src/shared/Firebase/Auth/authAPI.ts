@@ -2,15 +2,14 @@ import firebase from '../firebase';
 import 'firebase/auth'
 const auth = firebase.auth()
 
-export const loginUser = (email: string, password: string): Promise<void> => {
+export const loginUser = (email: string, password: string): Promise<void | firebase.User> => {
 
     return new Promise(async (resolve, reject) => {
       try {
         const userCredentials = await auth.signInWithEmailAndPassword(email, password)
         const user = userCredentials.user
         if (user) {
-          setUser(user)
-          resolve()
+          resolve(user)
         }
       } catch (error) {
         let message = '';
@@ -55,14 +54,16 @@ export const loginUser = (email: string, password: string): Promise<void> => {
     })
   }
 
-  const setUser = (user: firebase.User): void => {
-    user.getIdTokenResult().then(tokenResult => {
-      const token = tokenResult.token;
-      const tokenExp = tokenResult.expirationTime
-      localStorage.setItem('sr-token', token);
-      localStorage.setItem('sr-tokenExp', tokenExp);
-      localStorage.setItem('sr-userId', user.uid)
-    })
-  }
+  // I don't think I need to set any local data using authCheckState. 
+  // TODO: Look into authCheckState to check expiration of token and login status
+  // const setUser = (user: firebase.User): void => {
+  //   user.getIdTokenResult().then(tokenResult => {
+  //     const token = tokenResult.token;
+  //     const tokenExp = tokenResult.expirationTime
+  //     localStorage.setItem('sr-token', token);
+  //     localStorage.setItem('sr-tokenExp', tokenExp);
+  //     localStorage.setItem('sr-userId', user.uid)
+  //   })
+  // }
 
   
