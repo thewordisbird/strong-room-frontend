@@ -16,9 +16,8 @@ const App: React.FC = () => {
 
   const authenticatedRoutes = (
     <Switch>
-      {/* <Route path="/details"><InvoiceDetails /></Route>
-      <Route path="/"><InvoiceItems /></Route> */}
-      <Route path="/"><p>Authenticated</p></Route>
+      <Route path="/details"><InvoiceDetails /></Route>
+      <Route path="/"><InvoiceItems /></Route>
     </Switch>
   )
 
@@ -26,7 +25,6 @@ const App: React.FC = () => {
     <Switch>
       <Route path="/"><Login /></Route>
       <Redirect to="/" />
-      {/* <Route path="/"><p>Not authenticated</p></Route> */}
     </Switch>
   )
 

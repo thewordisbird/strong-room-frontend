@@ -5,7 +5,7 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 // import Firebase, { FirebaseContext } from './shared/Firebase';
 // import { AuthProvider } from './shared/Firebase/Auth/AuthProvider';
-import FirestoreProvider from './shared/Firebase/Firestore/FirestoreProvider'
+import {FirestoreProvider} from './shared/Firebase/Firestore/FirestoreProvider'
 import { StorageProvider } from './shared/Firebase/Storage/StorageProvider';
 import { AuthProvider } from './shared/Firebase/Auth/AuthProvider';
 

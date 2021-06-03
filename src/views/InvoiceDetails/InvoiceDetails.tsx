@@ -1,13 +1,14 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import Details from './Details/Details';
 import { LinearProgress } from '@material-ui/core';
-import { withStyles, WithStyles, createStyles } from '@material-ui/core/styles'
-import { Switch, Route, withRouter, RouteComponentProps} from 'react-router-dom'
-import { withFirestore, withFirestoreProps } from '../../shared/Firebase/Firestore/withFirestore'
+import { makeStyles } from '@material-ui/core/styles'
+import { Switch, Route, withRouter, RouteComponentProps, useLocation, useRouteMatch} from 'react-router-dom'
 import { withStorage, withStorageProps } from '../../shared/Firebase/Storage/withStorage';
 import { InvoiceData } from '../../shared/Firebase/Firestore/interfaces/InvoiceData';
+import { useFirestore } from '../../shared/Firebase/Firestore/FirestoreProvider';
+import { useStorage } from '../../shared/Firebase/Storage/useStorage';
 
-const styles = createStyles({
+const useStyles = makeStyles({
   root: {
     marginTop: '32px',
     marginBottom: '24px'
@@ -18,68 +19,62 @@ const styles = createStyles({
   }
 })
 
-type InvoiceDetailsProps = RouteComponentProps &  WithStyles<typeof styles> & withFirestoreProps & withStorageProps
+type InvoiceDetailsProps = RouteComponentProps &  withStorageProps
 
-type InvoiceDetailsState = {
-  isLoading: boolean
-  redirect: boolean
-  invoiceData: InvoiceData;
-  pdfUrl: string;
-}
-
-class InvoiceDetails extends Component<InvoiceDetailsProps, InvoiceDetailsState> {
-  state: InvoiceDetailsState = {
-    isLoading: false,
-    redirect: false,
+const InvoiceDetails = (props: InvoiceDetailsProps) => {
+  const [loading, setLoading] = useState(false);
+  const [redirect, setRedirect] = useState(false);
+  const [invoiceData, setInvoiceData] = useState({
     invoiceData: {} as InvoiceData,
-    pdfUrl: ""
-  }
-
-  async componentDidMount() {
-    this.setState({isLoading: true})
-    const { location, getInvoice, getPdfUrl } = this.props
+    pdfUrl: ''
+  })
+  
+  const classes = useStyles()
+  const match = useRouteMatch()
+  const location = useLocation();
+  const {getInvoice } = useFirestore();
+  const {getPdfUrl } = useStorage();
+  useEffect(() => {
+    setLoading(true)
     const id = location.pathname.split('/')[2]
 
-    try {
-      const invoiceData = await getInvoice(id)
-      const pdfUrl = await getPdfUrl(invoiceData.pdfId) as string
-
-      this.setState({
-        isLoading: false,
-        invoiceData: invoiceData,
-        pdfUrl: pdfUrl
-      })
-    } catch(err) {
-      this.setState(
-        {
-          redirect: true,
-          isLoading: false
-        })
+    async function getInvoiceData(id: string) {
+      try {
+        const invoiceData = getInvoice(id) as InvoiceData
+        const pdfUrl = await getPdfUrl(invoiceData.pdfId) as string
+        setInvoiceData({invoiceData: invoiceData, pdfUrl: pdfUrl})
+      } catch(err) {
+        setRedirect(true);
+      } finally {
+        setLoading(false)
+      }
     }
-  }
 
-  render () {
-    const { match, classes } = this.props
+    getInvoiceData(id);
     
-    let content = <LinearProgress className={classes.loading}/>
-    if (!this.state.isLoading && !this.state.redirect) {
-      content = (
-        <Switch>
-          <Route path={`${match.path}/:invoiceId`}><Details invoiceData={this.state.invoiceData} pdfUrl={this.state.pdfUrl}/></Route>
-        </Switch>
-      )
-    }
+    
+  }, [getInvoice, getPdfUrl, location])
+    
+  let content = <LinearProgress className={classes.loading}/>
 
-    if (this.state.redirect) {
-      content = <h1> 404: Page not found :(</h1>
-    }
-
-    return (
-      <div className={classes.root}>
-        {content}
-      </div>
-      )
-    }  
+  if (!loading && !redirect) {
+    content = (
+      <Switch>
+        <Route path={`${match.path}/:invoiceId`}><Details invoiceData={invoiceData.invoiceData} pdfUrl={invoiceData.pdfUrl}/></Route>
+      </Switch>
+    )
   }
 
-export default withStyles(styles)(withRouter(withFirestore(withStorage(InvoiceDetails))));
+  if (redirect) {
+    content = <h1> 404: Page not found :(</h1>
+  }
+
+  return (
+    <div className={classes.root}>
+      {content}
+    </div>
+    )
+  }  
+  
+
+export default withRouter(withStorage(InvoiceDetails));

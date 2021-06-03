@@ -31,7 +31,7 @@ const Login: React.FC = () => {
   const classes = useStyles()
   const history = useHistory();
 
-  const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  function handleEmailChange(event: React.ChangeEvent<HTMLInputElement>) {
     setForm(prevState => (
       {
         ...prevState,
@@ -40,7 +40,7 @@ const Login: React.FC = () => {
     ))
   }
 
-  const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  function handlePasswordChange(event: React.ChangeEvent<HTMLInputElement>) {
     setForm(prevState => (
       {
         ...prevState,
@@ -49,10 +49,9 @@ const Login: React.FC = () => {
     ))
   }
 
-  const handleSubmit = () => {
+  function handleSubmit() {
     login(form.email as string , form.password as string)
       .then(() => {
-        console.log('loggin in')
         history.push('/')
       })
       .catch(error => {
@@ -61,6 +60,7 @@ const Login: React.FC = () => {
   }
 
   return (
+    // TODO: Create sub components to handle display
     <div className={classes.root}>
       <Card className={classes.card}>
         <CardContent>
