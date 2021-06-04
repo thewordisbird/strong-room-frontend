@@ -1,14 +1,12 @@
 import React from 'react';
 
-import { withStyles, WithStyles, createStyles } from '@material-ui/core/styles';
-
 import PictureAsPdfIcon from '@material-ui/icons/PictureAsPdf';
 import {
-  Grid, Typography, Card, CardContent,
+  Grid, Typography, Card, CardContent, makeStyles,
 } from '@material-ui/core';
 import { InvoiceData } from '../../../shared/Firebase/Firestore/interfaces/InvoiceData';
 
-const styles = createStyles({
+const useStyles = makeStyles({
   root: {
     marginTop: '32px',
     marginBottom: '24px',
@@ -33,26 +31,35 @@ const styles = createStyles({
   },
 });
 
-type InvoiceDetailsProps = WithStyles<typeof styles> & {
+type InvoiceDetailsProps = {
   invoiceData: InvoiceData;
   pdfUrl: string;
 }
 
-const Details = (props: InvoiceDetailsProps) => {
-  const { invoiceData, pdfUrl, classes } = props;
+function Details(props: InvoiceDetailsProps): JSX.Element {
+  const { invoiceData, pdfUrl } = props;
 
-  const handleDownloadPdf = () => {
+  const classes = useStyles();
+
+  function handleDownloadPdf(): void {
     window.location.href = pdfUrl;
-  };
+  }
 
   return (
     <div className={classes.root}>
       <Card className={classes.card}>
         <CardContent>
-          <Typography className={classes.title} color="textSecondary" gutterBottom>
+          <Typography
+            className={classes.title}
+            color="textSecondary"
+            gutterBottom
+          >
             Invoice Info:
             {' '}
-            <PictureAsPdfIcon className={classes.icon} onClick={handleDownloadPdf} />
+            <PictureAsPdfIcon
+              className={classes.icon}
+              onClick={handleDownloadPdf}
+            />
           </Typography>
           <Grid container className="" spacing={2}>
             <Grid item xs={12} sm={6}>
@@ -81,7 +88,11 @@ const Details = (props: InvoiceDetailsProps) => {
 
       <Card className={classes.card}>
         <CardContent>
-          <Typography className={classes.title} color="textSecondary" gutterBottom>
+          <Typography
+            className={classes.title}
+            color="textSecondary"
+            gutterBottom
+          >
             Payment Info:
           </Typography>
           <Grid container spacing={2}>
@@ -120,6 +131,6 @@ const Details = (props: InvoiceDetailsProps) => {
       </Card>
     </div>
   );
-};
+}
 
-export default withStyles(styles)(Details);
+export default Details;

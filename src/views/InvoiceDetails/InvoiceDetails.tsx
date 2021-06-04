@@ -2,10 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { LinearProgress } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import {
-  Switch, Route, withRouter, RouteComponentProps, useLocation, useRouteMatch,
+  Switch, Route, useLocation, useRouteMatch,
 } from 'react-router-dom';
 import Details from './Details/Details';
-import { withStorage, withStorageProps } from '../../shared/Firebase/Storage/withStorage';
 import { InvoiceData } from '../../shared/Firebase/Firestore/interfaces/InvoiceData';
 import { useFirestore } from '../../shared/Firebase/Firestore/FirestoreProvider';
 import { useStorage } from '../../shared/Firebase/Storage/useStorage';
@@ -21,9 +20,7 @@ const useStyles = makeStyles({
   },
 });
 
-type InvoiceDetailsProps = RouteComponentProps & withStorageProps
-
-const InvoiceDetails = (props: InvoiceDetailsProps) => {
+function InvoiceDetails(): JSX.Element {
   const [loading, setLoading] = useState(false);
   const [redirect, setRedirect] = useState(false);
   const [invoiceData, setInvoiceData] = useState({
@@ -34,17 +31,19 @@ const InvoiceDetails = (props: InvoiceDetailsProps) => {
   const classes = useStyles();
   const match = useRouteMatch();
   const location = useLocation();
+
   const { getInvoice } = useFirestore();
   const { getPdfUrl } = useStorage();
+
   useEffect(() => {
     setLoading(true);
     const id = location.pathname.split('/')[2];
 
-    async function getInvoiceData(id: string) {
+    async function getInvoiceData(invoiceId: string): Promise<void> {
       try {
-        const invoiceData = getInvoice(id) as InvoiceData;
-        const pdfUrl = await getPdfUrl(invoiceData.pdfId) as string;
-        setInvoiceData({ invoiceData, pdfUrl });
+        const invoice = getInvoice(invoiceId) as InvoiceData;
+        const pdfUrl = await getPdfUrl(invoice.pdfId) as string;
+        setInvoiceData({ invoiceData: invoice, pdfUrl });
       } catch (err) {
         setRedirect(true);
       } finally {
@@ -60,7 +59,14 @@ const InvoiceDetails = (props: InvoiceDetailsProps) => {
   if (!loading && !redirect) {
     content = (
       <Switch>
-        <Route path={`${match.path}/:invoiceId`}><Details invoiceData={invoiceData.invoiceData} pdfUrl={invoiceData.pdfUrl} /></Route>
+        <Route
+          path={`${match.path}/:invoiceId`}
+        >
+          <Details
+            invoiceData={invoiceData.invoiceData}
+            pdfUrl={invoiceData.pdfUrl}
+          />
+        </Route>
       </Switch>
     );
   }
@@ -74,6 +80,6 @@ const InvoiceDetails = (props: InvoiceDetailsProps) => {
       {content}
     </div>
   );
-};
+}
 
-export default withRouter(withStorage(InvoiceDetails));
+export default InvoiceDetails;

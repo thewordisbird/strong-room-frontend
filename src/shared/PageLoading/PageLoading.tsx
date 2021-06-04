@@ -1,6 +1,6 @@
 import React from 'react';
 
-function PageLoading() {
+function PageLoading(): JSX.Element {
   return <p>...loading</p>;
 }
 

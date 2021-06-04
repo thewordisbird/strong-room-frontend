@@ -1,27 +1,31 @@
 import React, { useEffect, useState } from 'react';
 import InvoiceSearch from './InvoiceSearch/InvoiceSearch';
 import SearchResults from './SearchResults/SearchResults';
-import { InvoiceData } from '../../shared/Firebase/Firestore/interfaces/InvoiceData';
-import { useFirestore } from '../../shared/Firebase/Firestore/FirestoreProvider';
+import {
+  InvoiceData,
+} from '../../shared/Firebase/Firestore/interfaces/InvoiceData';
+import {
+  useFirestore,
+} from '../../shared/Firebase/Firestore/FirestoreProvider';
 import { filterInvoiceData } from './utils';
 
-type InvoiceItemsProps = {
-  children?: React.ReactNode;
-}
-
-const InvoiceItems = (props: InvoiceItemsProps) => {
-  const { loading, invoices, vendors } = useFirestore();
+function InvoiceItems(): JSX.Element {
   const [filteredInvoices, setFilteredInvoices] = useState<InvoiceData[]>([]);
-  const [searchParams, setSearchParams] = useState({ vendor: null, startDate: null, endDate: null });
+  const [searchParams, setSearchParams] = useState(
+    { vendor: null, startDate: null, endDate: null },
+  );
+
+  const { loading, invoices, vendors } = useFirestore();
 
   useEffect(() => {
-    console.log('useEffect invoices', invoices);
     const results = filterInvoiceData(invoices, searchParams);
-    console.log('useEffect results', results);
     setFilteredInvoices(results);
   }, [invoices, searchParams]);
 
-  function handleSearchParamChange(paramKey: string, paramValue: string | Date | null) {
+  function handleSearchParamChange(
+    paramKey: string,
+    paramValue: string | Date | null,
+  ): void {
     setSearchParams((prevState) => (
       {
         ...prevState,
@@ -32,10 +36,15 @@ const InvoiceItems = (props: InvoiceItemsProps) => {
 
   return (
     <div className="">
-      <InvoiceSearch loading={false} vendors={vendors} searchParams={searchParams} onChange={handleSearchParamChange} />
+      <InvoiceSearch
+        loading={false}
+        vendors={vendors}
+        searchParams={searchParams}
+        onChange={handleSearchParamChange}
+      />
       <SearchResults loading={loading} invoices={filteredInvoices} />
     </div>
   );
-};
+}
 
 export default InvoiceItems;

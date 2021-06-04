@@ -1,15 +1,15 @@
 import React from 'react';
-
-import { withStyles, WithStyles, createStyles } from '@material-ui/core/styles';
-
 import {
-  Card, CardContent, Grid, TextField,
+  Card, CardContent, Grid, makeStyles, TextField,
 } from '@material-ui/core';
-import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
+import {
+  MuiPickersUtilsProvider,
+  KeyboardDatePicker,
+} from '@material-ui/pickers';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import DateFnsUtils from '@date-io/date-fns';
 
-const styles = createStyles({
+const useStyles = makeStyles({
   root: {
     marginTop: '32px',
     marginBottom: '24px',
@@ -19,30 +19,39 @@ const styles = createStyles({
   },
 });
 
-type SearchProps = WithStyles<typeof styles> & {
+type SearchProps = {
+  // eslint-disable-next-line react/no-unused-prop-types
   loading: boolean;
   vendors: string[];
-  searchParams: {vendor: string | null, startDate: Date | null, endDate: Date | null}
+  searchParams: {
+    vendor: string | null,
+    startDate: Date | null,
+    endDate: Date | null
+  }
+  // eslint-disable-next-line no-unused-vars
   onChange: (paramKey: string, paramValue: string | Date | null) => void;
 }
 
-const InvoiceSearch: React.FC<SearchProps> = (props) => {
-  const {
-    vendors, searchParams, onChange, classes,
-  } = props;
+function InvoiceSearch(props: SearchProps): JSX.Element {
+  const { vendors, searchParams, onChange } = props;
 
-  // Handlers
-  const handleVendorChange = (event: React.ChangeEvent<{}>, newValue: string | null) => {
+  const classes = useStyles();
+
+  function handleVendorChange(
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    event: React.ChangeEvent<{}>,
+    newValue: string | null,
+  ): void {
     onChange('vendor', newValue);
-  };
+  }
 
-  const handleStartDateChange = (date: Date | null) => {
+  function handleStartDateChange(date: Date | null): void {
     onChange('startDate', date);
-  };
+  }
 
-  const handleEndDateChange = (date: Date | null) => {
+  function handleEndDateChange(date: Date | null): void {
     onChange('endDate', date);
-  };
+  }
 
   return (
     <div className={classes.root}>
@@ -56,7 +65,12 @@ const InvoiceSearch: React.FC<SearchProps> = (props) => {
               // style={{ width: "75%" }}
                 fullWidth
                 onChange={handleVendorChange}
-                renderInput={(params) => <TextField {...params} label="Select Vendor" variant="outlined" />}
+                renderInput={() => (
+                  <TextField
+                    label="Select Vendor"
+                    variant="outlined"
+                  />
+                )}
               />
             </Grid>
             <MuiPickersUtilsProvider utils={DateFnsUtils}>
@@ -94,6 +108,6 @@ const InvoiceSearch: React.FC<SearchProps> = (props) => {
       </Card>
     </div>
   );
-};
+}
 
-export default withStyles(styles)(InvoiceSearch);
+export default InvoiceSearch;

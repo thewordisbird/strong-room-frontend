@@ -1,54 +1,72 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 
-import { withRouter, RouteComponentProps } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 
 import {
-  TableContainer, LinearProgress, Paper, Table, TableHead, TableRow, TableCell, TableBody, Button, TableFooter, TablePagination,
+  TableContainer,
+  LinearProgress,
+  Paper,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Button,
+  TableFooter,
+  TablePagination,
 } from '@material-ui/core';
 
-import { InvoiceData } from '../../../shared/Firebase/Firestore/interfaces/InvoiceData';
+import {
+  InvoiceData,
+} from '../../../shared/Firebase/Firestore/interfaces/InvoiceData';
 
-type SearchResultsProps = RouteComponentProps & {
+type SearchResultsProps = {
+  // eslint-disable-next-line react/no-unused-prop-types
   loading: boolean;
   invoices: InvoiceData[];
 }
 
-type SearchResultsState = {
-  page: number;
-  rowsPerPage: number;
-}
+function SearchResults(props: SearchResultsProps): JSX.Element {
+  const { loading, invoices } = props;
 
-class SearchResults extends Component<SearchResultsProps, SearchResultsState> {
-  state: SearchResultsState = {
-    page: 0,
-    rowsPerPage: 25,
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(25);
+
+  const history = useHistory();
+
+  function handleSelect(id: string | undefined): void {
+    history.push(`/details/${id}`);
   }
 
-  onSelect = (id: string | undefined) => {
-    this.props.history.push(`/details/${id}`);
+  function handleChangePage(
+    event: React.MouseEvent<HTMLButtonElement> | null, newPage: number,
+  ): void {
+    setPage(newPage);
   }
 
-  onChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
-    this.setState({ page: newPage });
-  };
-
-  onChangeRowsPerPage = (
+  function handleChangeRowsPerPage(
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    const rowsPerPage = event.target.value === '-1' ? this.props.invoices.length : parseInt(event.target.value, 10);
-    this.setState(
-      {
-        rowsPerPage,
-        page: 0,
-      },
-    );
-  };
+  ): void {
+    const displayRowCount = event.target.value === '-1'
+      ? invoices.length
+      : parseInt(event.target.value, 10);
+    setPage(0);
+    setRowsPerPage(displayRowCount);
+  }
 
-  getRowData = () => {
-    const invoiceCount = this.props.invoices.length;
-    const startIndex = this.state.page === 0 ? 0 : this.state.page * this.state.rowsPerPage + 1;
-    const endIndex = startIndex + this.state.rowsPerPage + 1 < invoiceCount ? startIndex + this.state.rowsPerPage + 1 : invoiceCount;
-    return this.props.invoices.slice(startIndex, endIndex).map((invoice) => (
+  function getRowData(): {
+    id: string | undefined;
+    vendor: string;
+    check: string;
+    invoiceDate: string;
+    invoiceAmount: string;
+}[] {
+    const invoiceCount = invoices.length;
+    const startIndex = page === 0 ? 0 : page * rowsPerPage + 1;
+    const endIndex = startIndex + rowsPerPage + 1 < invoiceCount
+      ? startIndex + rowsPerPage + 1
+      : invoiceCount;
+    return props.invoices.slice(startIndex, endIndex).map((invoice) => (
       {
         id: invoice.id,
         vendor: invoice.Vendor,
@@ -59,62 +77,69 @@ class SearchResults extends Component<SearchResultsProps, SearchResultsState> {
     ));
   }
 
-  render() {
-    const { loading, invoices } = this.props;
-    let content = <LinearProgress />;
+  let content = <LinearProgress />;
 
-    if (!loading) {
-      const rowData = this.getRowData();
-      content = (
-        <TableContainer component={Paper}>
-          <Table className="table" aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <TableCell size="small">Details</TableCell>
-                <TableCell align="left">Vendor</TableCell>
-                <TableCell align="left">Invoice Amount</TableCell>
-                <TableCell align="left">Invoice Date</TableCell>
-                <TableCell align="left">Check Number</TableCell>
+  if (!loading) {
+    const rowData = getRowData();
+    content = (
+      <TableContainer component={Paper}>
+        <Table className="table" aria-label="simple table">
+          <TableHead>
+            <TableRow>
+              <TableCell size="small">Details</TableCell>
+              <TableCell align="left">Vendor</TableCell>
+              <TableCell align="left">Invoice Amount</TableCell>
+              <TableCell align="left">Invoice Date</TableCell>
+              <TableCell align="left">Check Number</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {rowData.map((row) => (
+              <TableRow key={row.id}>
+                <TableCell
+                  component="th"
+                  scope="row"
+                >
+                  <Button
+                    variant="contained"
+                    onClick={() => handleSelect(row.id)}
+                  >
+                    View Details
+                  </Button>
+                </TableCell>
+                <TableCell align="left">{row.vendor}</TableCell>
+                <TableCell align="left">
+                  $
+                  {row.invoiceAmount}
+                </TableCell>
+                <TableCell align="left">{row.invoiceDate}</TableCell>
+                <TableCell align="left">{row.check}</TableCell>
               </TableRow>
-            </TableHead>
-            <TableBody>
-              {rowData.map((row) => (
-                <TableRow key={row.id}>
-                  <TableCell component="th" scope="row"><Button variant="contained" onClick={() => this.onSelect(row.id)}>View Details</Button></TableCell>
-                  <TableCell align="left">{row.vendor}</TableCell>
-                  <TableCell align="left">
-                    $
-                    {row.invoiceAmount}
-                  </TableCell>
-                  <TableCell align="left">{row.invoiceDate}</TableCell>
-                  <TableCell align="left">{row.check}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-            <TableFooter>
-              <TableRow>
-                <TablePagination
-                  rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
-                  colSpan={3}
-                  count={invoices.length}
-                  rowsPerPage={this.state.rowsPerPage > 25 ? -1 : this.state.rowsPerPage}
-                  page={this.state.page}
-                  SelectProps={{
-                    inputProps: { 'aria-label': 'rows per page' },
-                    native: true,
-                  }}
-                  onChangePage={this.onChangePage}
-                  onChangeRowsPerPage={this.onChangeRowsPerPage}
-                />
-              </TableRow>
-            </TableFooter>
-          </Table>
-        </TableContainer>
-      );
-    }
-
-    return <div>{content}</div>;
+            ))}
+          </TableBody>
+          <TableFooter>
+            <TableRow>
+              <TablePagination
+                rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
+                colSpan={3}
+                count={invoices.length}
+                rowsPerPage={rowsPerPage > 25 ? -1 : rowsPerPage}
+                page={page}
+                SelectProps={{
+                  inputProps: { 'aria-label': 'rows per page' },
+                  native: true,
+                }}
+                onChangePage={handleChangePage}
+                onChangeRowsPerPage={handleChangeRowsPerPage}
+              />
+            </TableRow>
+          </TableFooter>
+        </Table>
+      </TableContainer>
+    );
   }
+
+  return <div>{content}</div>;
 }
 
-export default withRouter(SearchResults);
+export default SearchResults;

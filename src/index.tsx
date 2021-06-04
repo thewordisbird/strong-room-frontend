@@ -6,17 +6,14 @@ import reportWebVitals from './reportWebVitals';
 import {
   FirestoreProvider,
 } from './shared/Firebase/Firestore/FirestoreProvider';
-import { StorageProvider } from './shared/Firebase/Storage/StorageProvider';
 import { AuthProvider } from './shared/Firebase/Auth/AuthProvider';
 
 ReactDOM.render(
   <React.StrictMode>
     <FirestoreProvider>
-      <StorageProvider>
-        <AuthProvider>
-          <App />
-        </AuthProvider>
-      </StorageProvider>
+      <AuthProvider>
+        <App />
+      </AuthProvider>
     </FirestoreProvider>
   </React.StrictMode>,
   document.getElementById('root'),

@@ -20,7 +20,7 @@ const useStyles = makeStyles({
   },
 });
 
-const Login: React.FC = () => {
+function Login(): JSX.Element {
   const [form, setForm] = useState({
     email: '',
     password: '',
@@ -33,7 +33,7 @@ const Login: React.FC = () => {
   const classes = useStyles();
   const history = useHistory();
 
-  function handleEmailChange(event: React.ChangeEvent<HTMLInputElement>) {
+  function handleEmailChange(event: React.ChangeEvent<HTMLInputElement>): void {
     setForm((prevState) => (
       {
         ...prevState,
@@ -42,7 +42,7 @@ const Login: React.FC = () => {
     ));
   }
 
-  function handlePasswordChange(event: React.ChangeEvent<HTMLInputElement>) {
+  function handlePasswordChange(event: React.ChangeEvent<HTMLInputElement>): void {
     setForm((prevState) => (
       {
         ...prevState,
@@ -51,13 +51,13 @@ const Login: React.FC = () => {
     ));
   }
 
-  function handleSubmit() {
+  function handleSubmit(): void {
     login(form.email as string, form.password as string)
       .then(() => {
         history.push('/');
       })
-      .catch((error) => {
-        setError(error);
+      .catch((_error) => {
+        setError(_error);
       });
   }
 
@@ -98,13 +98,20 @@ const Login: React.FC = () => {
               />
             </Grid>
             <Grid item xs={12}>
-              <Button fullWidth variant="contained" color="primary" onClick={handleSubmit}>Login</Button>
+              <Button
+                fullWidth
+                variant="contained"
+                color="primary"
+                onClick={handleSubmit}
+              >
+                Login
+              </Button>
             </Grid>
           </Grid>
         </CardContent>
       </Card>
     </div>
   );
-};
+}
 
 export default Login;

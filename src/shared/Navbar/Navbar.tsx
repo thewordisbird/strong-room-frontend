@@ -1,5 +1,4 @@
 import React from 'react';
-
 import { makeStyles } from '@material-ui/core/styles';
 import { useHistory, NavLink } from 'react-router-dom';
 
@@ -38,27 +37,31 @@ type NavBarProps = {
   title: string;
 }
 
-const NavBar: React.FC<NavBarProps> = (props: NavBarProps) => {
+function NavBar(props: NavBarProps): JSX.Element {
   const { title } = props;
+
   const classes = useStyles();
   const history = useHistory();
   const { isAuthenticated, logout } = useAuth();
 
-  const handleLogout = () => {
-    console.log('loggin out user');
+  function handleLogout(): void {
     logout().then(() => {
       history.push('/auth');
     });
-  };
+  }
 
   return (
     <div className={classes.root}>
       <AppBar position="static">
         <Container maxWidth="md">
           <Toolbar>
-            {/* <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
-            <MenuIcon />
-          </IconButton> */}
+            {/* <IconButton
+              edge="start"
+              className={classes.menuButton}
+              color="inherit" aria-label="menu"
+            >
+              <MenuIcon />
+            </IconButton> */}
             <Typography variant="h6" className={classes.title}>
               {title}
             </Typography>
@@ -66,7 +69,14 @@ const NavBar: React.FC<NavBarProps> = (props: NavBarProps) => {
               ? (
                 <>
                   <Typography>
-                    <NavLink className={classes.navLink} to="/" activeClassName={classes.selected} exact>Invoices</NavLink>
+                    <NavLink
+                      className={classes.navLink}
+                      to="/"
+                      activeClassName={classes.selected}
+                      exact
+                    >
+                      Invoices
+                    </NavLink>
                   </Typography>
                   <Button color="inherit" onClick={handleLogout}>Logout</Button>
                 </>
@@ -77,6 +87,6 @@ const NavBar: React.FC<NavBarProps> = (props: NavBarProps) => {
       </AppBar>
     </div>
   );
-};
+}
 
 export default NavBar;
