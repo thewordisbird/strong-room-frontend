@@ -1,69 +1,54 @@
 import firebase from '../firebase';
-import 'firebase/auth'
-const auth = firebase.auth()
+import 'firebase/auth';
 
-export const loginUser = (email: string, password: string): Promise<void | firebase.User> => {
+const auth = firebase.auth();
 
-    return new Promise(async (resolve, reject) => {
-      try {
-        const userCredentials = await auth.signInWithEmailAndPassword(email, password)
-        const user = userCredentials.user
-        if (user) {
-          resolve(user)
-        }
-      } catch (error) {
-        let message = '';
-        
-        switch (error.code) {
-          case 'auth/invalid-email':
-            message = "Invalid email address.";
-            break;
-          case 'auth/user-not-found':
-            message = "Invalid user."
-            break;
-          case 'auth/wrong-password':
-            message = 'Invalid password.';
-            break;
-          default:
-            message = "Unknown Authentication Error."
-        }
-
-        reject(message)
-      }
+function loginUser(
+  email: string,
+  password:string,
+): Promise<void | firebase.User> {
+  return auth.signInWithEmailAndPassword(email, password)
+    .then((userCredentials) => {
+      const { user } = userCredentials;
+      return user as firebase.User;
     })
-  }
+    .catch((error) => {
+      let message = '';
 
-  export const logoutUser = () => {
-    return auth.signOut()
-      .then(() => {
-        localStorage.clear()
+      switch (error.code) {
+        case 'auth/invalid-email':
+          message = 'Invalid email address.';
+          break;
+        case 'auth/user-not-found':
+          message = 'Invalid user.';
+          break;
+        case 'auth/wrong-password':
+          message = 'Invalid password.';
+          break;
+        default:
+          message = 'Unknown Authentication Error.';
       }
-    )
-  }
+      throw (message);
+    });
+}
 
-  export const authCheckState = ():Promise<firebase.User | void> => {
-    // TODO: convert to promise
-    return new Promise((resolve, reject) => {
-      auth.onAuthStateChanged(user => {
-        if (user) {
-          resolve(user)
-        } else {
-          reject()
-        }
-      })
-    })
-  }
+function logoutUser(): Promise<void> {
+  return auth.signOut()
+    .then(() => {
+      localStorage.clear();
+    });
+}
 
-  // I don't think I need to set any local data using authCheckState. 
-  // TODO: Look into authCheckState to check expiration of token and login status
-  // const setUser = (user: firebase.User): void => {
-  //   user.getIdTokenResult().then(tokenResult => {
-  //     const token = tokenResult.token;
-  //     const tokenExp = tokenResult.expirationTime
-  //     localStorage.setItem('sr-token', token);
-  //     localStorage.setItem('sr-tokenExp', tokenExp);
-  //     localStorage.setItem('sr-userId', user.uid)
-  //   })
-  // }
+function authCheckState():Promise<firebase.User | void> {
+  return new Promise((resolve, reject) => {
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        resolve(user);
+      } else {
+        reject();
+      }
+    });
+  });
+}
 
-  
+export { loginUser, logoutUser, authCheckState };

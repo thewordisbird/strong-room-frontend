@@ -3,9 +3,9 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-// import Firebase, { FirebaseContext } from './shared/Firebase';
-// import { AuthProvider } from './shared/Firebase/Auth/AuthProvider';
-import {FirestoreProvider} from './shared/Firebase/Firestore/FirestoreProvider'
+import {
+  FirestoreProvider,
+} from './shared/Firebase/Firestore/FirestoreProvider';
 import { StorageProvider } from './shared/Firebase/Storage/StorageProvider';
 import { AuthProvider } from './shared/Firebase/Auth/AuthProvider';
 
@@ -19,7 +19,7 @@ ReactDOM.render(
       </StorageProvider>
     </FirestoreProvider>
   </React.StrictMode>,
-  document.getElementById('root')
+  document.getElementById('root'),
 );
 
 // If you want to start measuring performance in your app, pass a function

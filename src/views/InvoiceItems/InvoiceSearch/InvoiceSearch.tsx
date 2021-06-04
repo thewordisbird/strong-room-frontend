@@ -1,21 +1,23 @@
 import React from 'react';
 
-import { withStyles, WithStyles, createStyles } from '@material-ui/core/styles'
+import { withStyles, WithStyles, createStyles } from '@material-ui/core/styles';
 
-import { Card, CardContent, Grid, TextField } from '@material-ui/core';
+import {
+  Card, CardContent, Grid, TextField,
+} from '@material-ui/core';
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
-import Autocomplete from '@material-ui/lab/Autocomplete'
+import Autocomplete from '@material-ui/lab/Autocomplete';
 import DateFnsUtils from '@date-io/date-fns';
 
 const styles = createStyles({
   root: {
     marginTop: '32px',
-    marginBottom: '24px'
+    marginBottom: '24px',
   },
   card: {
-    margin: "12px 0"
+    margin: '12px 0',
   },
-})
+});
 
 type SearchProps = WithStyles<typeof styles> & {
   loading: boolean;
@@ -24,36 +26,38 @@ type SearchProps = WithStyles<typeof styles> & {
   onChange: (paramKey: string, paramValue: string | Date | null) => void;
 }
 
-const  InvoiceSearch: React.FC<SearchProps> = (props) => {
-  const { vendors, searchParams, onChange, classes } = props
+const InvoiceSearch: React.FC<SearchProps> = (props) => {
+  const {
+    vendors, searchParams, onChange, classes,
+  } = props;
 
   // Handlers
   const handleVendorChange = (event: React.ChangeEvent<{}>, newValue: string | null) => {
-    onChange('vendor', newValue)
-  }
+    onChange('vendor', newValue);
+  };
 
   const handleStartDateChange = (date: Date | null) => {
-    onChange('startDate', date)
-  }
+    onChange('startDate', date);
+  };
 
   const handleEndDateChange = (date: Date | null) => {
-    onChange('endDate', date)
-  }
-  
-    return (
-      <div className={classes.root}>
-        <Card className={classes.card}>
-          <CardContent>
+    onChange('endDate', date);
+  };
+
+  return (
+    <div className={classes.root}>
+      <Card className={classes.card}>
+        <CardContent>
           <Grid container spacing={3}>
-          <Grid item xs={12}>
-            <Autocomplete
-              id="vendor-combo-box"
-              options={vendors}
+            <Grid item xs={12}>
+              <Autocomplete
+                id="vendor-combo-box"
+                options={vendors}
               // style={{ width: "75%" }}
-              fullWidth
-              onChange={handleVendorChange}
-              renderInput={(params) => <TextField {...params} label="Select Vendor" variant="outlined" />}
-            />
+                fullWidth
+                onChange={handleVendorChange}
+                renderInput={(params) => <TextField {...params} label="Select Vendor" variant="outlined" />}
+              />
             </Grid>
             <MuiPickersUtilsProvider utils={DateFnsUtils}>
               <Grid item xs={6}>
@@ -66,7 +70,7 @@ const  InvoiceSearch: React.FC<SearchProps> = (props) => {
                   value={searchParams.startDate}
                   onChange={handleStartDateChange}
                   KeyboardButtonProps={{
-                  'aria-label': 'change date',
+                    'aria-label': 'change date',
                   }}
                 />
               </Grid>
@@ -80,16 +84,16 @@ const  InvoiceSearch: React.FC<SearchProps> = (props) => {
                   value={searchParams.endDate}
                   onChange={handleEndDateChange}
                   KeyboardButtonProps={{
-                  'aria-label': 'change date',
-                }}
+                    'aria-label': 'change date',
+                  }}
                 />
               </Grid>
             </MuiPickersUtilsProvider>
           </Grid>
-          </CardContent>
-        </Card>
-      </div>
-    )
-}
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
 
 export default withStyles(styles)(InvoiceSearch);
