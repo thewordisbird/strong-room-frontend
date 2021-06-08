@@ -15,7 +15,7 @@ function InvoiceItems(): JSX.Element {
     { vendor: null, startDate: null, endDate: null },
   );
 
-  const { loading, invoices, vendors } = useFirestore();
+  const { loading, invoices } = useFirestore();
 
   useEffect(() => {
     const results = filterInvoiceData(invoices, searchParams);
@@ -38,7 +38,7 @@ function InvoiceItems(): JSX.Element {
     <div className="">
       <InvoiceSearch
         loading={false}
-        vendors={vendors}
+        // vendors={vendors}
         searchParams={searchParams}
         onChange={handleSearchParamChange}
       />

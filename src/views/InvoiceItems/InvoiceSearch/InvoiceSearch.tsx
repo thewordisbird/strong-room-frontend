@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Card, CardContent, Grid, makeStyles, TextField,
 } from '@material-ui/core';
@@ -8,6 +8,9 @@ import {
 } from '@material-ui/pickers';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import DateFnsUtils from '@date-io/date-fns';
+import {
+  useFirestore,
+} from '../../../shared/Firebase/Firestore/FirestoreProvider';
 
 const useStyles = makeStyles({
   root: {
@@ -22,7 +25,7 @@ const useStyles = makeStyles({
 type SearchProps = {
   // eslint-disable-next-line react/no-unused-prop-types
   loading: boolean;
-  vendors: string[];
+  // vendors: string[];
   searchParams: {
     vendor: string | null,
     startDate: Date | null,
@@ -33,7 +36,13 @@ type SearchProps = {
 }
 
 function InvoiceSearch(props: SearchProps): JSX.Element {
-  const { vendors, searchParams, onChange } = props;
+  const { searchParams, onChange } = props;
+
+  const { vendors } = useFirestore();
+
+  useEffect(() => {
+    console.log(vendors);
+  }, [vendors]);
 
   const classes = useStyles();
 
@@ -62,11 +71,13 @@ function InvoiceSearch(props: SearchProps): JSX.Element {
               <Autocomplete
                 id="vendor-combo-box"
                 options={vendors}
-              // style={{ width: "75%" }}
+                // style={{ width: "75%" }}
                 fullWidth
                 onChange={handleVendorChange}
-                renderInput={() => (
+                renderInput={(params) => (
                   <TextField
+                    // eslint-disable-next-line react/jsx-props-no-spreading
+                    {...params}
                     label="Select Vendor"
                     variant="outlined"
                   />
