@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import {
   Card, CardContent, Grid, makeStyles, TextField,
 } from '@material-ui/core';
@@ -39,10 +39,6 @@ function InvoiceSearch(props: SearchProps): JSX.Element {
   const { searchParams, onChange } = props;
 
   const { vendors } = useFirestore();
-
-  useEffect(() => {
-    console.log(vendors);
-  }, [vendors]);
 
   const classes = useStyles();
 
